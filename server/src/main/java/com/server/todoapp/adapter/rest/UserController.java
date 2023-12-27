@@ -25,15 +25,15 @@ public class UserController {
 
     @Transactional
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegisterDto userRegisterDTO)
+    public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegisterDto userRegisterDto)
             throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
-        return new ResponseEntity<>(userService.registerUser(userRegisterDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.registerUser(userRegisterDto), HttpStatus.CREATED);
     }
 
     @Transactional
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> loginUser(@RequestBody UserLoginDto userLoginDTO)
+    public ResponseEntity<UserResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto)
             throws InvalidLoginCredentialsException {
-        return new ResponseEntity<>(userService.loginUser(userLoginDTO), HttpStatus.OK);
+        return new ResponseEntity<>(userService.loginUser(userLoginDto), HttpStatus.OK);
     }
 }

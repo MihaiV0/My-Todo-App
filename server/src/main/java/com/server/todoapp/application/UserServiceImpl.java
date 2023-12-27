@@ -26,9 +26,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponseDto registerUser(UserRegisterDto userRegisterDTO)
+    public UserResponseDto registerUser(UserRegisterDto userRegisterDto)
             throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
-        User user = new User(userRegisterDTO.getUsername(), userRegisterDTO.getEmail(), userRegisterDTO.getPassword());
+        User user = new User(userRegisterDto.getUsername(), userRegisterDto.getEmail(), userRegisterDto.getPassword());
 
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException("Username " + user.getUsername() + " is already used!");
@@ -42,12 +42,12 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponseDto loginUser(UserLoginDto userLoginDTO)
+    public UserResponseDto loginUser(UserLoginDto userLoginDto)
             throws InvalidLoginCredentialsException {
-        Optional<User> user = userRepository.findByUsernameOrEmail(userLoginDTO.getUsernameOrEmail());
+        Optional<User> user = userRepository.findByUsernameOrEmail(userLoginDto.getUsernameOrEmail());
 
         if (user.isPresent()) {
-            if (user.get().getPassword().equals(userLoginDTO.getPassword())) {
+            if (user.get().getPassword().equals(userLoginDto.getPassword())) {
                 return modelMapper.map(user.get(), UserResponseDto.class);
             } else {
                 throw new InvalidLoginCredentialsException("Incorrect username or password");
