@@ -1,3 +1,4 @@
+import RegisterSuccessViewVue from '@/views/RegisterSuccessView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import MainPage from '../views/MainPage.vue'
@@ -25,6 +26,11 @@ const router = createRouter({
       path: '/main',
       name: 'main',
       component: MainPage
+    },
+    {
+      path: '/register-success',
+      name: 'register-success',
+      component: RegisterSuccessViewVue
     },
   ]
 })

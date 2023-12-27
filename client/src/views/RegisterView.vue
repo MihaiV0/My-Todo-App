@@ -101,7 +101,7 @@ async function registerUser() {
 
         registerUserOnServer(usernameText.value, emailText.value, hashPassword)
             .then(res => {
-                router.push('/login');
+                router.push('/register-success');
             })
             .catch(err => {
                 errorMessage.value = err.message;
