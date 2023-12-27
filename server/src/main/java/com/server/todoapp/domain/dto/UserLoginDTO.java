@@ -3,7 +3,7 @@ package com.server.todoapp.domain.dto;
 import lombok.Data;
 
 @Data
-public class UserLoginDTO {
+public class UserLoginDto {
     private String usernameOrEmail;
     private String password;
 }

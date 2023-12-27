@@ -1,9 +1,9 @@
 package com.server.todoapp.adapter.rest;
 
 import com.server.todoapp.application.UserService;
-import com.server.todoapp.domain.dto.UserLoginDTO;
-import com.server.todoapp.domain.dto.UserRegisterDTO;
-import com.server.todoapp.domain.dto.UserResponseDTO;
+import com.server.todoapp.domain.dto.UserLoginDto;
+import com.server.todoapp.domain.dto.UserRegisterDto;
+import com.server.todoapp.domain.dto.UserResponseDto;
 import com.server.todoapp.domain.exception.EmailAlreadyExistsException;
 import com.server.todoapp.domain.exception.InvalidLoginCredentialsException;
 import com.server.todoapp.domain.exception.UsernameAlreadyExistsException;
@@ -25,14 +25,14 @@ public class UserController {
 
     @Transactional
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRegisterDTO userRegisterDTO)
+    public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegisterDto userRegisterDTO)
             throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
         return new ResponseEntity<>(userService.registerUser(userRegisterDTO), HttpStatus.CREATED);
     }
 
     @Transactional
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> loginUser(@RequestBody UserLoginDTO userLoginDTO)
+    public ResponseEntity<UserResponseDto> loginUser(@RequestBody UserLoginDto userLoginDTO)
             throws InvalidLoginCredentialsException {
         return new ResponseEntity<>(userService.loginUser(userLoginDTO), HttpStatus.OK);
     }

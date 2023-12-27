@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import CustomButton from '@/components/CustomButton.vue';
-import type router from '@/router';
-
 
 </script>
 

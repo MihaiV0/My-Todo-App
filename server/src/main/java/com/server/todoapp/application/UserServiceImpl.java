@@ -1,8 +1,8 @@
 package com.server.todoapp.application;
 
-import com.server.todoapp.domain.dto.UserLoginDTO;
-import com.server.todoapp.domain.dto.UserRegisterDTO;
-import com.server.todoapp.domain.dto.UserResponseDTO;
+import com.server.todoapp.domain.dto.UserLoginDto;
+import com.server.todoapp.domain.dto.UserRegisterDto;
+import com.server.todoapp.domain.dto.UserResponseDto;
 import com.server.todoapp.domain.entity.User;
 import com.server.todoapp.domain.exception.EmailAlreadyExistsException;
 import com.server.todoapp.domain.exception.InvalidLoginCredentialsException;
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponseDTO registerUser(UserRegisterDTO userRegisterDTO)
+    public UserResponseDto registerUser(UserRegisterDto userRegisterDTO)
             throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
         User user = new User(userRegisterDTO.getUsername(), userRegisterDTO.getEmail(), userRegisterDTO.getPassword());
 
@@ -38,17 +38,17 @@ public class UserServiceImpl implements UserService{
             throw new EmailAlreadyExistsException("Email " + user.getEmail() + " is already used!");
         }
 
-        return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
+        return modelMapper.map(userRepository.save(user), UserResponseDto.class);
     }
 
     @Override
-    public UserResponseDTO loginUser(UserLoginDTO userLoginDTO)
+    public UserResponseDto loginUser(UserLoginDto userLoginDTO)
             throws InvalidLoginCredentialsException {
         Optional<User> user = userRepository.findByUsernameOrEmail(userLoginDTO.getUsernameOrEmail());
 
         if (user.isPresent()) {
             if (user.get().getPassword().equals(userLoginDTO.getPassword())) {
-                return modelMapper.map(user.get(), UserResponseDTO.class);
+                return modelMapper.map(user.get(), UserResponseDto.class);
             } else {
                 throw new InvalidLoginCredentialsException("Incorrect username or password");
             }
