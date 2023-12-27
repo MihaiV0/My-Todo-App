@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
+@Transactional
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
 
@@ -23,14 +24,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @Transactional
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegisterDto userRegisterDto)
             throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
         return new ResponseEntity<>(userService.registerUser(userRegisterDto), HttpStatus.CREATED);
     }
-
-    @Transactional
+    
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto)
             throws InvalidLoginCredentialsException {
