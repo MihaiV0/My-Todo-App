@@ -27,8 +27,8 @@ public class InitialDataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (ddlAuto.equals("create")) {
-            User user = createUser("edi pop",
-                    "edi.pop@gmail.com",
+            User user = createUser("Edi_Pop",
+                    "edi.pop43@gmail.com",
                     BCrypt.hashpw("AppAdmin123@", bcryptSalt));
             userRepository.save(user);
         }

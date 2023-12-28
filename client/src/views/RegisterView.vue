@@ -56,7 +56,7 @@ async function registerUser() {
 
     if (inputOK && !emailRegex.test(emailText.value)) {
         inputOK = false;
-        errorMessage.value = 'Inavlid email address';
+        errorMessage.value = 'Invalid email address';
         showErrorPopup.value = true;
     }
 
