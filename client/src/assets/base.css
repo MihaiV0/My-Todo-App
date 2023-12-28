@@ -1,7 +1,10 @@
 :root {
   --background-color: #F5EEC8;
   --main-color: #555843;
+  --green-secondary-color: #A7D397;
+  --grey-secondary-color: #D0D4CA;
   --default-font-size: 18px;
+  --navbar-height: 5vh;
 }
 
 /* Used to change the color of the text from the file termsAndConditions.ts */
