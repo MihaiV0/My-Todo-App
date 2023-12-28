@@ -69,7 +69,7 @@ function mouseClick($event: MouseEvent) {
             :show-tooltip="showTooltip"
             :text="tooltipText"
             :top-position="`calc(${mousePositionY}px + 4vh)`"
-            :left-position="`calc(${mousePositionX}px - 10vw)`"
+            :left-position="`calc(${mousePositionX}px + 1.2vw)`"
         />
     </div>
 </template>
