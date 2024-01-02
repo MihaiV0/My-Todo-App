@@ -51,8 +51,58 @@ async function loginUserOnServer(usernameOrEmail: string, password: string) {
     return response.json();
 }
 
+async function addUserTodo(username: string, title: string, description: string) {
+
+    const response = await fetch(`${serverURL}todos/add`, {
+        "method": 'POST',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+        "body": JSON.stringify({
+            "title": title,
+            "description": description,
+            "username": username
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('User does not exist!');
+    }
+
+    return response.json();
+}
+
+async function getAllUserTodo(username: string) {
+
+    const response = await fetch(`${serverURL}todos/all?username=${username}`, {
+        "method": 'GET',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('User does not exist!');
+    }
+
+    return response.json();
+}
+
+function saveUserData(username: string, email: string) {
+    localStorage.setItem('username', username);
+    localStorage.setItem('email', email);
+}
+
+function clearUserData() {
+    localStorage.clear();
+}
+
 export {
+    addUserTodo,
+    clearUserData,
+    getAllUserTodo,
     loginUserOnServer,
-    registerUserOnServer
+    registerUserOnServer,
+    saveUserData
 };
 

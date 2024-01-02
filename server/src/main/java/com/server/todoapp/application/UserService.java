@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
 
-    public UserResponseDto registerUser(UserRegisterDto userRegisterDTO) throws UsernameAlreadyExistsException, EmailAlreadyExistsException;
+    UserResponseDto registerUser(UserRegisterDto userRegisterDTO) throws UsernameAlreadyExistsException, EmailAlreadyExistsException;
 
-    public UserResponseDto loginUser(UserLoginDto userLoginDTO) throws InvalidLoginCredentialsException;
+    UserResponseDto loginUser(UserLoginDto userLoginDTO) throws InvalidLoginCredentialsException;
 }

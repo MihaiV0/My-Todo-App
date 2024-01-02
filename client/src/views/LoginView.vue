@@ -5,7 +5,7 @@ import FormTitle from '@/components/FormTitle.vue';
 import CustomButton from '@/components/CustomButton.vue';
 import { ref } from 'vue';
 import router from '@/router';
-import { loginUserOnServer } from '@/data/server';
+import { saveUserData, loginUserOnServer } from '@/data/server';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
 import bcrypt from "bcryptjs";
 
@@ -27,7 +27,8 @@ async function loginUser() {
 
     loginUserOnServer(usernameOrEmailText.value, hashPassword)
         .then(res => {
-            router.push('/main');
+            saveUserData(res.username, res.email);
+            router.push('/my-todos');
         })
         .catch(err => {
             errorMessage.value = err.message;

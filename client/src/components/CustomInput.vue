@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import TooltipDisplay from './TooltipDisplay.vue';
 
 const props = defineProps({
@@ -7,6 +7,9 @@ const props = defineProps({
     inputType: String,
     isPasswordField: Boolean,
     tooltipText: String,
+    initialValue: String,
+    inputDisabled: Boolean,
+    customWidth: String,
 });
 
 const emits = defineEmits(['change-value']);
@@ -41,6 +44,13 @@ function mouseClick($event: MouseEvent) {
     }
 }
 
+watch(
+    () => props.initialValue, 
+    (oldValue, newValue) => {
+        inputText.value = props.initialValue || '';
+    }
+);
+
 </script>
 
 <template>
@@ -50,11 +60,14 @@ function mouseClick($event: MouseEvent) {
             'password-input': isPasswordField,
             'focus-div': focusedDiv 
         }"
+        :style="{ width: customWidth }"
     >
         <input 
             :type="inputType"
             :placeholder="placeholderText"
+            :disabled="inputDisabled"
             v-model="inputText"
+            
             :class="{ 
                 'reduced-input': isPasswordField, 
                 'normal-input-size': !isPasswordField,
@@ -80,6 +93,11 @@ function mouseClick($event: MouseEvent) {
         border: 0.5px solid transparent;
         padding: 5px 7px;
         outline: none; /* remove default outline */
+    }
+
+    input:disabled {
+        background-color: white;
+        opacity: 0.7;
     }
 
     .normal-input:hover {

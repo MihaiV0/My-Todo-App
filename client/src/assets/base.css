@@ -5,6 +5,11 @@
   --grey-secondary-color: #D0D4CA;
   --default-font-size: 18px;
   --navbar-height: 5vh;
+  --todo-panel-width: 20%;
+  --navbar-border-bottom-height: 1px;
+  --todo-panel-border-right-width: 2px;
+  --toolbar-height: 4vh;
+  --toolbar-border-bottom-height: 2px;
 }
 
 /* Used to change the color of the text from the file termsAndConditions.ts */
