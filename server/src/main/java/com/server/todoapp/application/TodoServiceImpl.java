@@ -1,9 +1,11 @@
 package com.server.todoapp.application;
 
+import com.server.todoapp.domain.dto.TodoPatchRequest;
 import com.server.todoapp.domain.dto.TodoPostRequest;
 import com.server.todoapp.domain.dto.TodoResponse;
 import com.server.todoapp.domain.entity.Todo;
 import com.server.todoapp.domain.entity.User;
+import com.server.todoapp.domain.exception.TodoNotFoundException;
 import com.server.todoapp.domain.exception.UserNotFoundException;
 import com.server.todoapp.domain.repository.TodoRepository;
 import com.server.todoapp.domain.repository.UserRepository;
@@ -52,6 +54,22 @@ public class TodoServiceImpl implements TodoService {
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found!"));
 
         return convertListOfTodoToListOfTodoResponse(todoRepository.getAllTodosForUser(user.getId()));
+    }
+
+    @Override
+    public TodoResponse updateTodo(Integer todoId, TodoPatchRequest request)
+            throws TodoNotFoundException {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new TodoNotFoundException("Todo with id " + todoId + " not found!"));
+
+        if (request.getTitle() != null) {
+            todo.setTodoTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            todo.setTodoDescription(request.getDescription());
+        }
+
+        return modelMapper.map(todoRepository.save(todo), TodoResponse.class);
     }
 
     private List<TodoResponse> convertListOfTodoToListOfTodoResponse(List<Todo> allTodos) {

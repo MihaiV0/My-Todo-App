@@ -1,9 +1,6 @@
 package com.server.todoapp.utils;
 
-import com.server.todoapp.domain.exception.EmailAlreadyExistsException;
-import com.server.todoapp.domain.exception.InvalidLoginCredentialsException;
-import com.server.todoapp.domain.exception.UserNotFoundException;
-import com.server.todoapp.domain.exception.UsernameAlreadyExistsException;
+import com.server.todoapp.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +26,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = TodoNotFoundException.class)
+    public ResponseEntity<String> handleTodoNotFoundException(TodoNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

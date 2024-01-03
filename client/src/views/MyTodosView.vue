@@ -5,7 +5,7 @@ import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
 import NavSeparator from '@/components/NavSeparator.vue';
 import { ref, watch, onMounted } from 'vue';
-import { addUserTodo, getAllUserTodo } from '@/data/server';
+import { addUserTodo, editUserTodo, getAllUserTodo } from '@/data/server';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
 
 interface Todo {
@@ -18,8 +18,8 @@ const todos = ref<Array<Todo>>([]);
 
 onMounted(() => {
     getAllUserTodo(localStorage.getItem('username') || '')
-        .then(res => {
-            res.forEach((todo: Todo) => {
+        .then((res: Array<Todo>) => {
+            res.forEach(todo => {
                 todos.value.push(todo);
             });
         })
@@ -33,10 +33,10 @@ const todoDescription = ref('');
 const todoTitle = ref('');
 const activeTodoId = ref(-2);
 const editing = ref(false);
-const addingNewTodo = ref(false);
 const currentOperation = ref('');
 const errorMessage = ref('');
 const showErrorPopup = ref(false);
+const editingTodoId = ref(0);
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -47,7 +47,7 @@ function showTodoDesciption(todoId: number) {
 }
 
 function addNewTodo() {
-    if (!addingNewTodo.value) {
+    if (currentOperation.value != 'edit' && currentOperation.value != 'add') {
         todoTitle.value = 'New Todo';
         todoDescription.value = '';
         activeTodoId.value = -1;
@@ -57,7 +57,6 @@ function addNewTodo() {
             title: 'New Todo',
             description: ''
         });
-        addingNewTodo.value = true;
 
         currentOperation.value = 'add';
     } else {
@@ -73,9 +72,18 @@ function cancel() {
         todoTitle.value = '';
         todoDescription.value = '';
         activeTodoId.value = -2;
-        addingNewTodo.value = false;
 
         currentOperation.value = '';
+    } else if (currentOperation.value == 'edit') {
+        editingTodoId.value = 0;
+        currentOperation.value = '';
+        editing.value = false;
+
+        const activeTodo = todos.value.find(todo => todo.todoId == activeTodoId.value);
+        if (activeTodo) {
+            todoTitle.value = activeTodo.title;
+            todoDescription.value = activeTodo.description;
+        }
     }
 }
 
@@ -83,21 +91,14 @@ function saveTodo() {
     if (currentOperation.value == 'add') {
         if (todoTitle.value && todoDescription.value) {
             addUserTodo(localStorage.getItem('username') || '', todoTitle.value, todoDescription.value)
-                .then(res => {
+                .then((res: Todo) => {
                     todos.value.pop();
 
-                    const newTodo = {
-                        todoId: res.todoId,
-                        title: res.title,
-                        description: res.description
-                    };
-
-                    todos.value.push(newTodo);
+                    todos.value.push(res);
 
                     todoTitle.value = '';
                     todoDescription.value = '';
                     activeTodoId.value = -2;
-                    addingNewTodo.value = false;
                     currentOperation.value = '';
                 })
                 .catch(err => {
@@ -106,6 +107,40 @@ function saveTodo() {
                 });
         } else {
             errorMessage.value = 'All fields are mandatory';
+            showErrorPopup.value = true;
+        }
+    } else if (currentOperation.value == 'edit') {
+        if (todoTitle.value && todoDescription.value) {
+            editUserTodo(todoTitle.value, todoDescription.value, activeTodoId.value)
+                .then((res: Todo) => {
+                    const index = todos.value.findIndex(todo => todo.todoId == res.todoId);
+                    if (index != -1) {
+                        todos.value[index] = res;
+
+                        todoTitle.value = res.title;
+                        todoDescription.value = res.description;
+                        activeTodoId.value = res.todoId;
+                        currentOperation.value = '';
+                        editing.value = false;
+                        editingTodoId.value = 0;
+                    } else {
+                        errorMessage.value = 'Todo index is -1 - not found in array!';
+                        showErrorPopup.value = true;
+                    }
+                })
+                .catch(err => {
+                    errorMessage.value = err.message;
+                    showErrorPopup.value = true;
+                });
+        } else {
+            let emptyFieldName = '';
+            if (!todoTitle.value) {
+                emptyFieldName = 'title';
+            } else if (!todoDescription.value) {
+                emptyFieldName = 'description';
+            }
+
+            errorMessage.value = `Field ${emptyFieldName} cannot be empty!`;
             showErrorPopup.value = true;
         }
     }
@@ -122,13 +157,25 @@ function descriptionChanged(newDescription: string) {
 watch(
     activeTodoId, 
     (oldValue, newValue) => {
-        editing.value = (activeTodoId.value == -1);
+        editing.value = (activeTodoId.value == -1 && currentOperation.value == 'add') || 
+            (activeTodoId.value == editingTodoId.value && currentOperation.value == 'edit');
     }
 );
 
 function closeErrorPopup() {
     showErrorPopup.value = false;
     errorMessage.value = '';
+}
+
+function editTodo() {
+    if (currentOperation.value != 'edit' && currentOperation.value != 'add') {
+        currentOperation.value = 'edit';
+        editingTodoId.value = activeTodoId.value;
+        editing.value = true;
+    } else {
+        errorMessage.value = 'Already adding or editing a todo!';
+        showErrorPopup.value = true;
+    }
 }
 
 </script>
@@ -141,6 +188,16 @@ function closeErrorPopup() {
                     add_task
                 </span>
                 Add new todo
+            </ToolbarButtonBase>
+            <NavSeparator v-show="activeTodoId > 0"/>
+            <ToolbarButtonBase
+                v-show="activeTodoId > 0"
+                @click="editTodo"
+            >
+                <span class="material-symbols-outlined blue-sign">
+                    edit
+                </span>
+                Edit
             </ToolbarButtonBase>
             <NavSeparator v-show="editing"/>
             <ToolbarButtonBase
@@ -201,6 +258,11 @@ function closeErrorPopup() {
 
     .green-sign {
         color: #007900;
+        font-size: inherit;
+    }
+
+    .blue-sign {
+        color: #00129b;
         font-size: inherit;
     }
 

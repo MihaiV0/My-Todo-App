@@ -88,6 +88,26 @@ async function getAllUserTodo(username: string) {
     return response.json();
 }
 
+async function editUserTodo(title: string, description: string, todoId: number) {
+
+    const response = await fetch(`${serverURL}todos/edit?id=${todoId}`, {
+        "method": 'PATCH',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+        "body": JSON.stringify({
+            "title": title,
+            "description": description,
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('Todo does not exist!');
+    }
+
+    return response.json();
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -100,6 +120,7 @@ function clearUserData() {
 export {
     addUserTodo,
     clearUserData,
+    editUserTodo,
     getAllUserTodo,
     loginUserOnServer,
     registerUserOnServer,
