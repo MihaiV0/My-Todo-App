@@ -18,4 +18,6 @@ public interface TodoService {
     List<TodoResponse> getAllTodos(String username) throws UserNotFoundException;
 
     TodoResponse updateTodo(Integer todoId, TodoPatchRequest request) throws TodoNotFoundException;
+
+    void deleteTodo(Integer todoId) throws TodoNotFoundException;
 }

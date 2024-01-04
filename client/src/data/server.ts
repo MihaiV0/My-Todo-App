@@ -108,6 +108,22 @@ async function editUserTodo(title: string, description: string, todoId: number) 
     return response.json();
 }
 
+async function todoDelete(todoId: number) {
+
+    const response = await fetch(`${serverURL}todos/delete?id=${todoId}`, {
+        "method": 'DELETE',
+        "headers": {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (response.status >= 200 && response.status < 300) {
+        return;
+    } else if (response.status == 404) {
+        throw new Error('Todo not found');
+    }
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -124,6 +140,7 @@ export {
     getAllUserTodo,
     loginUserOnServer,
     registerUserOnServer,
-    saveUserData
+    saveUserData,
+    todoDelete
 };
 

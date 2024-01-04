@@ -72,6 +72,15 @@ public class TodoServiceImpl implements TodoService {
         return modelMapper.map(todoRepository.save(todo), TodoResponse.class);
     }
 
+    @Override
+    public void deleteTodo(Integer todoId)
+            throws TodoNotFoundException {
+        todoRepository.findById(todoId)
+                .orElseThrow(() -> new TodoNotFoundException("Todo with id " + todoId + " not found!"));
+
+        todoRepository.deleteById(todoId);
+    }
+
     private List<TodoResponse> convertListOfTodoToListOfTodoResponse(List<Todo> allTodos) {
         List<TodoResponse> todoResponses = new ArrayList<>();
         for (int i = 0; i < allTodos.size(); i++) {

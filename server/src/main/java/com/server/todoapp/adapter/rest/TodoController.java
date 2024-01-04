@@ -43,4 +43,11 @@ public class TodoController {
             throws TodoNotFoundException {
         return new ResponseEntity<>(todoService.updateTodo(todoId, request), HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteTodo(@RequestParam("id") Integer todoId)
+            throws TodoNotFoundException {
+        todoService.deleteTodo(todoId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

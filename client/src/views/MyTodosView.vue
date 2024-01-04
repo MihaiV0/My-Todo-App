@@ -5,8 +5,9 @@ import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
 import NavSeparator from '@/components/NavSeparator.vue';
 import { ref, watch, onMounted } from 'vue';
-import { addUserTodo, editUserTodo, getAllUserTodo } from '@/data/server';
+import { addUserTodo, editUserTodo, getAllUserTodo, todoDelete } from '@/data/server';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
+import DeleteTodoPopup from '@/components/DeleteTodoPopup.vue';
 
 interface Todo {
     todoId: number;
@@ -17,8 +18,13 @@ interface Todo {
 const todos = ref<Array<Todo>>([]);
 
 onMounted(() => {
+    updateTodosFromServer();
+});
+
+function updateTodosFromServer() {
     getAllUserTodo(localStorage.getItem('username') || '')
         .then((res: Array<Todo>) => {
+            todos.value = [];
             res.forEach(todo => {
                 todos.value.push(todo);
             });
@@ -27,7 +33,7 @@ onMounted(() => {
             errorMessage.value = err.message;
             showErrorPopup.value = true;
         });
-});
+}
 
 const todoDescription = ref('');
 const todoTitle = ref('');
@@ -37,6 +43,7 @@ const currentOperation = ref('');
 const errorMessage = ref('');
 const showErrorPopup = ref(false);
 const editingTodoId = ref(0);
+const showDeletePopup = ref(false);
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -178,6 +185,31 @@ function editTodo() {
     }
 }
 
+function deleteTodo() {
+    showDeletePopup.value = true;
+}
+
+function cancelDeleteTodo() {
+    showDeletePopup.value = false;
+}
+
+function actionDeleteTodo() {
+    todoDelete(activeTodoId.value)
+        .then(res => {
+            showDeletePopup.value = false;
+            todoTitle.value = '';
+            todoDescription.value = '';
+            activeTodoId.value = -2;
+            
+            updateTodosFromServer();
+        })
+        .catch(err => {
+            showDeletePopup.value = false;
+            errorMessage.value = err.message;
+            showErrorPopup.value = true;
+        });
+}
+
 </script>
 
 <template>
@@ -198,6 +230,16 @@ function editTodo() {
                     edit
                 </span>
                 Edit
+            </ToolbarButtonBase>
+            <NavSeparator v-show="activeTodoId > 0"/>
+            <ToolbarButtonBase
+                v-show="activeTodoId > 0"
+                @click="deleteTodo"
+            >
+                <span class="material-symbols-outlined red-sign">
+                    delete
+                </span>
+                Delete
             </ToolbarButtonBase>
             <NavSeparator v-show="editing"/>
             <ToolbarButtonBase
@@ -241,6 +283,11 @@ function editTodo() {
             :error-text="errorMessage"
             :show-popup="showErrorPopup"
             @close="closeErrorPopup"
+        />
+        <DeleteTodoPopup 
+            :show-popup="showDeletePopup"
+            @cancel="cancelDeleteTodo"
+            @delete-todo="actionDeleteTodo"
         />
     </Teleport>
 </template>
