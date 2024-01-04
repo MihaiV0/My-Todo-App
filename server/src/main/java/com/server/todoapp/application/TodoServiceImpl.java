@@ -81,6 +81,15 @@ public class TodoServiceImpl implements TodoService {
         todoRepository.deleteById(todoId);
     }
 
+    @Override
+    public List<TodoResponse> searchTodo(String text, String username)
+            throws UserNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found!"));
+
+        return convertListOfTodoToListOfTodoResponse(todoRepository.searchForTodo(text, user.getId()));
+    }
+
     private List<TodoResponse> convertListOfTodoToListOfTodoResponse(List<Todo> allTodos) {
         List<TodoResponse> todoResponses = new ArrayList<>();
         for (int i = 0; i < allTodos.size(); i++) {

@@ -5,9 +5,10 @@ import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
 import NavSeparator from '@/components/NavSeparator.vue';
 import { ref, watch, onMounted } from 'vue';
-import { addUserTodo, editUserTodo, getAllUserTodo, todoDelete } from '@/data/server';
+import { addUserTodo, editUserTodo, getAllUserTodo, searchTodo, todoDelete } from '@/data/server';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
 import DeleteTodoPopup from '@/components/DeleteTodoPopup.vue';
+import CustomInput from '@/components/CustomInput.vue';
 
 interface Todo {
     todoId: number;
@@ -200,7 +201,7 @@ function actionDeleteTodo() {
             todoTitle.value = '';
             todoDescription.value = '';
             activeTodoId.value = -2;
-            
+
             updateTodosFromServer();
         })
         .catch(err => {
@@ -208,6 +209,17 @@ function actionDeleteTodo() {
             errorMessage.value = err.message;
             showErrorPopup.value = true;
         });
+}
+
+function search(newSearchText: string) {
+    if (!newSearchText) {
+        updateTodosFromServer();
+    } else {
+        searchTodo(newSearchText, localStorage.getItem('username') || '')
+            .then((res: Array<Todo>) => {
+                todos.value = res;
+            });
+    }
 }
 
 </script>
@@ -261,6 +273,13 @@ function actionDeleteTodo() {
                 </span>
                 Cancel
             </ToolbarButtonBase>
+            <NavSeparator />
+            <CustomInput 
+                input-type="text"
+                placeholder-text="Search"
+                :is-password-field="false"
+                @change-value="search"
+            />
         </ToolbarBase>
         <div id="my-todos-container">
             <TodoPanel 

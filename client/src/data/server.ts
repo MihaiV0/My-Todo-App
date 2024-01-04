@@ -124,6 +124,22 @@ async function todoDelete(todoId: number) {
     }
 }
 
+async function searchTodo(text: string, username: string) {
+
+    const response = await fetch(`${serverURL}todos/search?text=${text}&username=${username}`, {
+        "method": 'GET',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('User does not exist!');
+    }
+
+    return response.json();
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -141,6 +157,7 @@ export {
     loginUserOnServer,
     registerUserOnServer,
     saveUserData,
+    searchTodo,
     todoDelete
 };
 

@@ -13,4 +13,7 @@ public interface TodoRepository extends CrudRepository<Todo, Integer> {
 
     @Query(value = "SELECT * FROM todo WHERE user_id = :userId", nativeQuery = true)
     List<Todo> getAllTodosForUser(@Param("userId") Integer userId);
+
+    @Query(value = "SELECT * FROM todo WHERE user_id = :userId AND LOWER(todo_title) LIKE LOWER('%' || :text || '%')", nativeQuery = true)
+    List<Todo> searchForTodo(@Param("text") String text, @Param("userId") Integer userId);
 }

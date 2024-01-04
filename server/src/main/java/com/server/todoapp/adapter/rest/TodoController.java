@@ -50,4 +50,11 @@ public class TodoController {
         todoService.deleteTodo(todoId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<TodoResponse>> searchTodo(@RequestParam("text") String text,
+                                                         @RequestParam("username") String username)
+            throws UserNotFoundException {
+        return new ResponseEntity<>(todoService.searchTodo(text, username), HttpStatus.OK);
+    }
 }
