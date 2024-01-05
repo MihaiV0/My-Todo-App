@@ -48,14 +48,20 @@ public class InitialDataLoader implements CommandLineRunner {
                     "The endpoint must use GET HTTP method to return all todos for a specified user. The user id must be sent as query parameter to this endpoint.",
                     userEdiPop,
                     "07.05.2024");
+            Todo todoImplementSortingFunction = createTodo("Implement sorting function",
+                    "Implement a sorting function to sort all todos by the due date field",
+                    userEdiPop,
+                    "25.08.2024");
 
             userEdiPop.getTodos().add(todoFixDescriptionDisplay);
             userEdiPop.getTodos().add(todoImplementGetAllTodosEndpoint);
+            userEdiPop.getTodos().add(todoImplementSortingFunction);
 
             userRepository.save(userEdiPop);
 
             todoRepository.save(todoFixDescriptionDisplay);
             todoRepository.save(todoImplementGetAllTodosEndpoint);
+            todoRepository.save(todoImplementSortingFunction);
         }
     }
 

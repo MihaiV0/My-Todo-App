@@ -2,11 +2,11 @@
 </script>
 
 <template>
-    <div class="separator"></div>
+    <div class="nav-separator"></div>
 </template>
 
 <style scoped>
-    .separator {
+    .nav-separator {
         height: var(--navbar-height);
         width: 0.2vw;
         background-color: var(--main-color);

@@ -3,13 +3,14 @@ import TodoDescription from '@/components/TodoDescription.vue';
 import TodoPanel from '@/components/TodoPanel.vue';
 import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
-import NavSeparator from '@/components/NavSeparator.vue';
+import ToolbarSeparator from '@/components/ToolbarSeparator.vue';
 import { ref, watch, onMounted } from 'vue';
 import { addUserTodo, editUserTodo, getAllUserTodo, searchTodo, todoDelete } from '@/data/server';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
 import DeleteTodoPopup from '@/components/DeleteTodoPopup.vue';
 import CustomInput from '@/components/CustomInput.vue';
 import { useDateFormat, useNow } from '@vueuse/core';
+import DropDown from '@/components/DropDown.vue';
 
 interface Todo {
     todoId: number;
@@ -24,6 +25,8 @@ onMounted(() => {
     updateTodosFromServer();
 });
 
+const sortingOptions = ["No sorting", "Due date", "Due date desc"];
+
 function updateTodosFromServer() {
     getAllUserTodo(localStorage.getItem('username') || '')
         .then((res: Array<Todo>) => {
@@ -31,6 +34,21 @@ function updateTodosFromServer() {
             res.forEach(todo => {
                 todos.value.push(todo);
             });
+        })
+        .catch(err => {
+            errorMessage.value = err.message;
+            showErrorPopup.value = true;
+        });
+}
+
+function updateTodosFromServerAndSort() {
+    getAllUserTodo(localStorage.getItem('username') || '')
+        .then((res: Array<Todo>) => {
+            todos.value = [];
+            res.forEach(todo => {
+                todos.value.push(todo);
+            });
+            sortTodos();
         })
         .catch(err => {
             errorMessage.value = err.message;
@@ -48,6 +66,8 @@ const showErrorPopup = ref(false);
 const editingTodoId = ref(0);
 const showDeletePopup = ref(false);
 const dueDate = ref('');
+const sorting = ref('No sorting');
+const searchText = ref('');
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -112,8 +132,8 @@ function saveTodo() {
                         dueDate.value)
                 .then((res: Todo) => {
                     todos.value.pop();
-
                     todos.value.push(res);
+                    searchTodoByTitleAndSort();
 
                     todoTitle.value = '';
                     todoDescription.value = '';
@@ -143,6 +163,8 @@ function saveTodo() {
                         currentOperation.value = '';
                         editing.value = false;
                         editingTodoId.value = 0;
+
+                        searchTodoByTitleAndSort();
                     } else {
                         errorMessage.value = 'Todo index is -1 - not found in array!';
                         showErrorPopup.value = true;
@@ -217,6 +239,7 @@ function actionDeleteTodo() {
             activeTodoId.value = -2;
 
             updateTodosFromServer();
+            searchTodoByTitleAndSort();
         })
         .catch(err => {
             showDeletePopup.value = false;
@@ -226,18 +249,46 @@ function actionDeleteTodo() {
 }
 
 function search(newSearchText: string) {
-    if (!newSearchText) {
-        updateTodosFromServer();
+    searchText.value = newSearchText;
+    searchTodoByTitleAndSort();
+}
+
+function searchTodoByTitleAndSort() {
+    if (!searchText.value) {
+        updateTodosFromServerAndSort();
     } else {
-        searchTodo(newSearchText, localStorage.getItem('username') || '')
+        searchTodo(searchText.value, localStorage.getItem('username') || '')
             .then((res: Array<Todo>) => {
                 todos.value = res;
+                if (sorting.value != 'No sorting') {
+                    sortTodos();
+                }
             });
     }
 }
 
 function dateChanged(newDate: string) {
     dueDate.value = newDate;
+}
+
+function updateSortingAndSortTodos(newSorting: string) {
+    sorting.value = newSorting;
+    sortTodos();
+}
+
+function sortTodos() {
+    switch(sorting.value) {
+        case 'No sorting': updateTodosFromServer();
+            break;
+        case 'Due date': todos.value.sort((a: Todo, b: Todo) => 
+            new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+        );
+            break;
+        case 'Due date desc': todos.value.sort((a: Todo, b: Todo) => 
+            new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()
+        );
+            break;
+    }
 }
 
 </script>
@@ -251,7 +302,7 @@ function dateChanged(newDate: string) {
                 </span>
                 Add new todo
             </ToolbarButtonBase>
-            <NavSeparator v-show="activeTodoId > 0"/>
+            <ToolbarSeparator v-show="activeTodoId > 0"/>
             <ToolbarButtonBase
                 v-show="activeTodoId > 0"
                 @click="editTodo"
@@ -261,7 +312,7 @@ function dateChanged(newDate: string) {
                 </span>
                 Edit
             </ToolbarButtonBase>
-            <NavSeparator v-show="activeTodoId > 0"/>
+            <ToolbarSeparator v-show="activeTodoId > 0"/>
             <ToolbarButtonBase
                 v-show="activeTodoId > 0"
                 @click="deleteTodo"
@@ -271,7 +322,7 @@ function dateChanged(newDate: string) {
                 </span>
                 Delete
             </ToolbarButtonBase>
-            <NavSeparator v-show="editing"/>
+            <ToolbarSeparator v-show="editing"/>
             <ToolbarButtonBase
                 v-show="editing"
                 @click="saveTodo"
@@ -281,7 +332,7 @@ function dateChanged(newDate: string) {
                 </span>
                 Save
             </ToolbarButtonBase>
-            <NavSeparator v-show="editing"/>
+            <ToolbarSeparator v-show="editing"/>
             <ToolbarButtonBase
                 v-show="editing"
                 @click="cancel"
@@ -291,13 +342,23 @@ function dateChanged(newDate: string) {
                 </span>
                 Cancel
             </ToolbarButtonBase>
-            <NavSeparator />
+            <ToolbarSeparator />
             <CustomInput 
                 input-type="text"
-                placeholder-text="Search"
+                placeholder-text="Search by title"
                 :is-password-field="false"
                 @change-value="search"
             />
+            <ToolbarSeparator />
+            <div id="sorting-tools">
+                Sorting:
+                <DropDown 
+                    drop-down-id="sort-by-drop-down"
+                    :values="sortingOptions"
+                    initial-value="No sorting"
+                    @value-changed="updateSortingAndSortTodos"
+                />
+            </div>
         </ToolbarBase>
         <div id="my-todos-container">
             <TodoPanel 
@@ -355,6 +416,13 @@ function dateChanged(newDate: string) {
     .red-sign {
         color: #C30000;
         font-size: inherit;
+    }
+
+    #sorting-tools {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 1vw;
     }
 
 </style>
