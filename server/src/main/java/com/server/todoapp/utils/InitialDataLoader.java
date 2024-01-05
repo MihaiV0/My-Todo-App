@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Component
@@ -40,10 +42,12 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Todo todoFixDescriptionDisplay = createTodo("Fix the description display",
                     "The display of the description of the todo does not show all the text. Please take a look and fix.",
-                    userEdiPop);
+                    userEdiPop,
+                    "18.10.2024");
             Todo todoImplementGetAllTodosEndpoint = createTodo("Implement GET HTTP method get all todos endpoint",
                     "The endpoint must use GET HTTP method to return all todos for a specified user. The user id must be sent as query parameter to this endpoint.",
-                    userEdiPop);
+                    userEdiPop,
+                    "07.05.2024");
 
             userEdiPop.getTodos().add(todoFixDescriptionDisplay);
             userEdiPop.getTodos().add(todoImplementGetAllTodosEndpoint);
@@ -65,11 +69,12 @@ public class InitialDataLoader implements CommandLineRunner {
         return user;
     }
 
-    private Todo createTodo(String title, String description, User user) {
+    private Todo createTodo(String title, String description, User user, String dueDate) {
         Todo todo = new Todo();
         todo.setTodoTitle(title);
         todo.setTodoDescription(description);
         todo.setUser(user);
+        todo.setDueDate(LocalDate.parse(dueDate, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         return todo;
     }

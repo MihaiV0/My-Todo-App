@@ -9,11 +9,13 @@ import { addUserTodo, editUserTodo, getAllUserTodo, searchTodo, todoDelete } fro
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
 import DeleteTodoPopup from '@/components/DeleteTodoPopup.vue';
 import CustomInput from '@/components/CustomInput.vue';
+import { useDateFormat, useNow } from '@vueuse/core';
 
 interface Todo {
     todoId: number;
     title: string;
     description: string;
+    dueDate: string;
 }
 
 const todos = ref<Array<Todo>>([]);
@@ -45,6 +47,7 @@ const errorMessage = ref('');
 const showErrorPopup = ref(false);
 const editingTodoId = ref(0);
 const showDeletePopup = ref(false);
+const dueDate = ref('');
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -52,18 +55,21 @@ function showTodoDesciption(todoId: number) {
     activeTodoId.value = todoId;
     todoDescription.value = todo?.description || '';
     todoTitle.value = todo?.title || '';
+    dueDate.value = useDateFormat(todo?.dueDate, 'DD.MM.YYYY').value;
 }
 
 function addNewTodo() {
     if (currentOperation.value != 'edit' && currentOperation.value != 'add') {
         todoTitle.value = 'New Todo';
         todoDescription.value = '';
+        dueDate.value = useDateFormat(useNow(), 'DD.MM.YYYY').value;
         activeTodoId.value = -1;
 
         todos.value.push({
             todoId: -1,
             title: 'New Todo',
-            description: ''
+            description: '',
+            dueDate: useDateFormat(useNow(), 'DD.MM.YYYY').value
         });
 
         currentOperation.value = 'add';
@@ -79,6 +85,7 @@ function cancel() {
 
         todoTitle.value = '';
         todoDescription.value = '';
+        dueDate.value = '';
         activeTodoId.value = -2;
 
         currentOperation.value = '';
@@ -91,14 +98,18 @@ function cancel() {
         if (activeTodo) {
             todoTitle.value = activeTodo.title;
             todoDescription.value = activeTodo.description;
+            dueDate.value = useDateFormat(activeTodo.dueDate, 'DD.MM.YYYY').value;
         }
     }
 }
 
 function saveTodo() {
     if (currentOperation.value == 'add') {
-        if (todoTitle.value && todoDescription.value) {
-            addUserTodo(localStorage.getItem('username') || '', todoTitle.value, todoDescription.value)
+        if (todoTitle.value && todoDescription.value && dueDate.value) {
+            addUserTodo(localStorage.getItem('username') || '', 
+                        todoTitle.value, 
+                        todoDescription.value, 
+                        dueDate.value)
                 .then((res: Todo) => {
                     todos.value.pop();
 
@@ -107,6 +118,7 @@ function saveTodo() {
                     todoTitle.value = '';
                     todoDescription.value = '';
                     activeTodoId.value = -2;
+                    dueDate.value = '';
                     currentOperation.value = '';
                 })
                 .catch(err => {
@@ -118,8 +130,8 @@ function saveTodo() {
             showErrorPopup.value = true;
         }
     } else if (currentOperation.value == 'edit') {
-        if (todoTitle.value && todoDescription.value) {
-            editUserTodo(todoTitle.value, todoDescription.value, activeTodoId.value)
+        if (todoTitle.value && todoDescription.value && dueDate.value) {
+            editUserTodo(todoTitle.value, todoDescription.value, activeTodoId.value, dueDate.value)
                 .then((res: Todo) => {
                     const index = todos.value.findIndex(todo => todo.todoId == res.todoId);
                     if (index != -1) {
@@ -146,6 +158,8 @@ function saveTodo() {
                 emptyFieldName = 'title';
             } else if (!todoDescription.value) {
                 emptyFieldName = 'description';
+            } else if (!dueDate.value) {
+                emptyFieldName = 'due date'
             }
 
             errorMessage.value = `Field ${emptyFieldName} cannot be empty!`;
@@ -222,6 +236,10 @@ function search(newSearchText: string) {
     }
 }
 
+function dateChanged(newDate: string) {
+    dueDate.value = newDate;
+}
+
 </script>
 
 <template>
@@ -290,10 +308,12 @@ function search(newSearchText: string) {
             <TodoDescription 
                 :description="todoDescription"
                 :title="todoTitle"
+                :dueDate="dueDate"
                 :editing="editing"
                 :active-todo-id="activeTodoId"
                 @title-changed="titleChanged"
                 @description-changed="descriptionChanged"
+                @date-changed="dateChanged"
             />
         </div>
     </div>

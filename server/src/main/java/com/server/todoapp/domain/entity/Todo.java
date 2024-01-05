@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @ToString
@@ -23,6 +25,9 @@ public class Todo {
 
     @Column
     private String todoDescription;
+
+    @Column
+    private LocalDate dueDate;
 
     @JsonIgnoreProperties("todos")
     @ManyToOne

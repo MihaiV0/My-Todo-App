@@ -12,6 +12,8 @@ import com.server.todoapp.domain.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +38,11 @@ public class TodoServiceImpl implements TodoService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User with username " + request.getUsername() + " not found!"));
 
-        Todo todo = new Todo(request.getTitle(), request.getDescription());
+        Todo todo = new Todo();
+        todo.setTodoTitle(request.getTitle());
+        todo.setTodoDescription(request.getDescription());
         todo.setUser(user);
+        todo.setDueDate(LocalDate.parse(request.getDueDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         if (user.getTodos() == null) {
             user.setTodos(new ArrayList<>());
@@ -67,6 +72,9 @@ public class TodoServiceImpl implements TodoService {
         }
         if (request.getDescription() != null) {
             todo.setTodoDescription(request.getDescription());
+        }
+        if (request.getDueDate() != null) {
+            todo.setDueDate(LocalDate.parse(request.getDueDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         }
 
         return modelMapper.map(todoRepository.save(todo), TodoResponse.class);
