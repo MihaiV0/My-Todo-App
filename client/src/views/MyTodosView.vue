@@ -87,6 +87,7 @@ const mFilterPrio2s = ref(false);
 const mFilterOpen = ref(false);
 const mFilterInProgress = ref(false);
 const mFilterClosed = ref(false);
+const mFiltersActive = ref(false);
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -310,8 +311,7 @@ function updateSortingAndSortTodos(newSorting: string) {
 function sortTodos() {
     switch(sorting.value) {
         case 'No sorting': 
-            if (!mFilterPrio1s.value && !mFilterPrio2s.value && !mFilterOpen.value &&
-                !mFilterInProgress.value && !mFilterClosed.value) {
+            if (!mFiltersActive.value) {
                 updateTodosFromServer();
             }
             break;
@@ -367,8 +367,18 @@ function filterTodosAction(filterPrio1s: boolean,
     mFilterOpen.value = filterOpen;
     mFilterInProgress.value = filterInProgress;
     mFilterClosed.value = filterClosed;
+    checkFiltersActive();
     updateTodosFromServerAndSortFilter();
     hideFilterTodosPopup();
+}
+
+function checkFiltersActive() {
+    if (mFilterPrio1s.value || mFilterPrio2s.value || mFilterOpen.value ||
+        mFilterInProgress.value || mFilterClosed.value) {
+        mFiltersActive.value = true;
+    } else {
+        mFiltersActive.value = false;
+    }
 }
 
 </script>
@@ -444,6 +454,10 @@ function filterTodosAction(filterPrio1s: boolean,
             <ToolbarButtonBase @click="showFilterTodosPopup">
                 Filtering options
             </ToolbarButtonBase>
+            <ToolbarSeparator />
+            <div id="filter-status">
+                Filters: {{ mFiltersActive ? 'on' : 'off' }}
+            </div>
         </ToolbarBase>
         <div id="my-todos-container">
             <TodoPanel 
@@ -522,6 +536,12 @@ function filterTodosAction(filterPrio1s: boolean,
         display: flex;
         align-items: center;
         padding: 0 1vw;
+    }
+
+    #filter-status {
+        margin: 0 1vw;
+        display: flex;
+        align-items: center;
     }
 
 </style>
