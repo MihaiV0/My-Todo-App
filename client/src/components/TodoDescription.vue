@@ -5,6 +5,7 @@ import TodoField from './TodoField.vue';
 import CustomSizeTextarea from './CustomSizeTextarea.vue';
 import VueFlatpickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.min.css';
+import DropDown from '@/components/DropDown.vue';
 
 const props = defineProps({
     title: String,
@@ -12,9 +13,11 @@ const props = defineProps({
     editing: Boolean,
     activeTodoId: Number,
     dueDate: String,
+    status: String,
+    priority: String,
 });
 
-const emits = defineEmits(['title-changed', 'description-changed', "date-changed"]);
+const emits = defineEmits(['title-changed', 'description-changed', "date-changed", "status-changed", "priority-changed"]);
 
 function titleChanged(newTitle: string) {
     titleText.value = newTitle;
@@ -34,6 +37,8 @@ const flatpickrConfig = {
     dateFormat: 'd.m.Y',
     minDate: "today"
 }
+const statusOptions = ["OPEN", "IN PROGRESS", "CLOSED"];
+const priorityOptions = ["PRIO 1", "PRIO 2"];
 
 watch(
     () => props.title, 
@@ -62,6 +67,14 @@ function dateChanged(newDate: string) {
     emits('date-changed', newDate);
 }
 
+function statusChanged(newStatus: string) {
+    emits('status-changed', newStatus);
+}
+
+function priorityChanged(newPriority: string) {
+    emits('priority-changed', newPriority);
+}
+
 </script>
 
 <template>
@@ -71,6 +84,38 @@ function dateChanged(newDate: string) {
     >
         <TodoField>
             <h2>{{ editing ? initialTitle : title }}</h2>
+        </TodoField>
+        <TodoField>
+            Status:
+            <DropDown 
+                :values="statusOptions"
+                :initial-value="status"
+                :drop-down-id="`status-dropdown-${activeTodoId}`"
+                @value-changed="statusChanged"
+                :enabled="editing"
+                :custom-size="true"
+            />
+        </TodoField>
+        <TodoField>
+            Priority:
+            <DropDown 
+                :values="priorityOptions"
+                :initial-value="priority"
+                :drop-down-id="`priority-dropdown-${activeTodoId}`"
+                @value-changed="priorityChanged"
+                :enabled="editing"
+                :custom-size="true"
+            />
+        </TodoField>
+        <TodoField>
+            Due date:
+            <VueFlatpickr
+                :config="flatpickrConfig"
+                v-model:model-value="selectedDate"
+                class="date-picker"
+                @on-change="dateChanged(selectedDate)"
+                :disabled="!editing"
+            />
         </TodoField>
         <TodoField>
             Title:
@@ -93,16 +138,6 @@ function dateChanged(newDate: string) {
                 @text-changed="descriptionChanged"
                 placeholder-text="Todo description"
                 :input-disabled="!editing"
-            />
-        </TodoField>
-        <TodoField>
-            Due date:
-            <VueFlatpickr
-                :config="flatpickrConfig"
-                v-model:model-value="selectedDate"
-                class="date-picker"
-                @on-change="dateChanged(selectedDate)"
-                :disabled="!editing"
             />
         </TodoField>
     </div>

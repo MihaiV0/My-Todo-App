@@ -14,7 +14,12 @@ const props = defineProps({
     dropDownId: {
         type: String,
         required: true
-    }
+    },
+    enabled: {
+        type: Boolean,
+        required: true
+    },
+    customSize: Boolean,
 });
 
 const emits = defineEmits(['value-changed']);
@@ -32,6 +37,13 @@ watch(
     }
 )
 
+watch(
+    () => props.initialValue,
+    (oldValue, newValue) => {
+        currentValue.value = props.initialValue || '';
+    }
+)
+
 </script>
 
 <template>
@@ -39,6 +51,11 @@ watch(
         :id="dropDownId"
         v-model="currentValue"
         class="drop-down"
+        :disabled="!enabled"
+        :style="{
+            fontSize: customSize ? '14px' : '',
+            width: customSize ? '18vw' : '',
+        }"
     >
         <option 
             v-for="element in values"
@@ -59,6 +76,11 @@ watch(
     select option:checked {
         background-color: var(--main-color);
         color: white;
+    }
+
+    select:disabled {
+        background-color: white;
+        opacity: 0.7;
     }
 
 </style>

@@ -1,5 +1,7 @@
 package com.server.todoapp.application;
 
+import com.server.todoapp.domain.data.types.Priority;
+import com.server.todoapp.domain.data.types.Status;
 import com.server.todoapp.domain.dto.TodoPatchRequest;
 import com.server.todoapp.domain.dto.TodoPostRequest;
 import com.server.todoapp.domain.dto.TodoResponse;
@@ -43,6 +45,8 @@ public class TodoServiceImpl implements TodoService {
         todo.setTodoDescription(request.getDescription());
         todo.setUser(user);
         todo.setDueDate(LocalDate.parse(request.getDueDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        todo.setStatus(Status.valueOf(replaceSpacesWithUnderscores(request.getStatus()).toUpperCase()));
+        todo.setPriority(Priority.valueOf(replaceSpacesWithUnderscores(request.getPriority()).toUpperCase()));
 
         if (user.getTodos() == null) {
             user.setTodos(new ArrayList<>());
@@ -76,6 +80,12 @@ public class TodoServiceImpl implements TodoService {
         if (request.getDueDate() != null) {
             todo.setDueDate(LocalDate.parse(request.getDueDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         }
+        if (request.getStatus() != null) {
+            todo.setStatus(Status.valueOf(replaceSpacesWithUnderscores(request.getStatus()).toUpperCase()));
+        }
+        if (request.getPriority() != null) {
+            todo.setPriority(Priority.valueOf(replaceSpacesWithUnderscores(request.getPriority()).toUpperCase()));
+        }
 
         return modelMapper.map(todoRepository.save(todo), TodoResponse.class);
     }
@@ -105,5 +115,16 @@ public class TodoServiceImpl implements TodoService {
         }
 
         return todoResponses;
+    }
+
+    private String replaceSpacesWithUnderscores(String initial) {
+        StringBuilder sb = new StringBuilder();
+        String[] parts = initial.split(" ");
+        sb.append(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            sb.append("_");
+            sb.append(parts[i]);
+        }
+        return sb.toString();
     }
 }

@@ -17,6 +17,8 @@ interface Todo {
     title: string;
     description: string;
     dueDate: string;
+    status: string;
+    priority: string;
 }
 
 const todos = ref<Array<Todo>>([]);
@@ -32,6 +34,7 @@ function updateTodosFromServer() {
         .then((res: Array<Todo>) => {
             todos.value = [];
             res.forEach(todo => {
+                replaceUnderscoresWithSpaces(todo);
                 todos.value.push(todo);
             });
         })
@@ -46,6 +49,7 @@ function updateTodosFromServerAndSort() {
         .then((res: Array<Todo>) => {
             todos.value = [];
             res.forEach(todo => {
+                replaceUnderscoresWithSpaces(todo);
                 todos.value.push(todo);
             });
             sortTodos();
@@ -54,6 +58,11 @@ function updateTodosFromServerAndSort() {
             errorMessage.value = err.message;
             showErrorPopup.value = true;
         });
+}
+
+function replaceUnderscoresWithSpaces(todo: Todo) {
+    todo.status = todo.status.replace(/_/g, ' ');
+    todo.priority = todo.priority.replace(/_/g, ' ');
 }
 
 const todoDescription = ref('');
@@ -68,6 +77,8 @@ const showDeletePopup = ref(false);
 const dueDate = ref('');
 const sorting = ref('No sorting');
 const searchText = ref('');
+const status = ref('');
+const priority = ref('');
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -76,6 +87,8 @@ function showTodoDesciption(todoId: number) {
     todoDescription.value = todo?.description || '';
     todoTitle.value = todo?.title || '';
     dueDate.value = useDateFormat(todo?.dueDate, 'DD.MM.YYYY').value;
+    status.value = todo?.status || '';
+    priority.value = todo?.priority || '';
 }
 
 function addNewTodo() {
@@ -84,12 +97,16 @@ function addNewTodo() {
         todoDescription.value = '';
         dueDate.value = useDateFormat(useNow(), 'DD.MM.YYYY').value;
         activeTodoId.value = -1;
+        status.value = "OPEN";
+        priority.value = "PRIO 2";
 
         todos.value.push({
             todoId: -1,
             title: 'New Todo',
             description: '',
-            dueDate: useDateFormat(useNow(), 'DD.MM.YYYY').value
+            dueDate: useDateFormat(useNow(), 'DD.MM.YYYY').value,
+            status: "OPEN",
+            priority: "PRIO 2"
         });
 
         currentOperation.value = 'add';
@@ -107,6 +124,8 @@ function cancel() {
         todoDescription.value = '';
         dueDate.value = '';
         activeTodoId.value = -2;
+        status.value = '';
+        priority.value = '';
 
         currentOperation.value = '';
     } else if (currentOperation.value == 'edit') {
@@ -119,6 +138,8 @@ function cancel() {
             todoTitle.value = activeTodo.title;
             todoDescription.value = activeTodo.description;
             dueDate.value = useDateFormat(activeTodo.dueDate, 'DD.MM.YYYY').value;
+            status.value = activeTodo.status;
+            priority.value = activeTodo.priority;
         }
     }
 }
@@ -129,7 +150,9 @@ function saveTodo() {
             addUserTodo(localStorage.getItem('username') || '', 
                         todoTitle.value, 
                         todoDescription.value, 
-                        dueDate.value)
+                        dueDate.value,
+                        status.value,
+                        priority.value)
                 .then((res: Todo) => {
                     todos.value.pop();
                     todos.value.push(res);
@@ -140,6 +163,8 @@ function saveTodo() {
                     activeTodoId.value = -2;
                     dueDate.value = '';
                     currentOperation.value = '';
+                    status.value = '';
+                    priority.value = '';
                 })
                 .catch(err => {
                     errorMessage.value = err.message;
@@ -151,7 +176,12 @@ function saveTodo() {
         }
     } else if (currentOperation.value == 'edit') {
         if (todoTitle.value && todoDescription.value && dueDate.value) {
-            editUserTodo(todoTitle.value, todoDescription.value, activeTodoId.value, dueDate.value)
+            editUserTodo(todoTitle.value, 
+                         todoDescription.value, 
+                         activeTodoId.value, 
+                         dueDate.value, 
+                         status.value, 
+                         priority.value)
                 .then((res: Todo) => {
                     const index = todos.value.findIndex(todo => todo.todoId == res.todoId);
                     if (index != -1) {
@@ -291,6 +321,14 @@ function sortTodos() {
     }
 }
 
+function statusChanged(newStatus: string) {
+    status.value = newStatus;
+}
+
+function priorityChanged(newPriority: string) {
+    priority.value = newPriority;
+}
+
 </script>
 
 <template>
@@ -351,12 +389,13 @@ function sortTodos() {
             />
             <ToolbarSeparator />
             <div id="sorting-tools">
-                Sorting:
+                Sort by:
                 <DropDown 
                     drop-down-id="sort-by-drop-down"
                     :values="sortingOptions"
                     initial-value="No sorting"
                     @value-changed="updateSortingAndSortTodos"
+                    :enabled="true"
                 />
             </div>
         </ToolbarBase>
@@ -372,9 +411,13 @@ function sortTodos() {
                 :dueDate="dueDate"
                 :editing="editing"
                 :active-todo-id="activeTodoId"
+                :status="status"
+                :priority="priority"
                 @title-changed="titleChanged"
                 @description-changed="descriptionChanged"
                 @date-changed="dateChanged"
+                @status-changed="statusChanged"
+                @priority-changed="priorityChanged"
             />
         </div>
     </div>

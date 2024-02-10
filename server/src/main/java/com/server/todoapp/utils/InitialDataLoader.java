@@ -1,5 +1,7 @@
 package com.server.todoapp.utils;
 
+import com.server.todoapp.domain.data.types.Priority;
+import com.server.todoapp.domain.data.types.Status;
 import com.server.todoapp.domain.entity.Todo;
 import com.server.todoapp.domain.entity.User;
 import com.server.todoapp.domain.repository.TodoRepository;
@@ -43,15 +45,21 @@ public class InitialDataLoader implements CommandLineRunner {
             Todo todoFixDescriptionDisplay = createTodo("Fix the description display",
                     "The display of the description of the todo does not show all the text. Please take a look and fix.",
                     userEdiPop,
-                    "18.10.2024");
+                    "18.10.2024",
+                    Status.OPEN,
+                    Priority.PRIO_1);
             Todo todoImplementGetAllTodosEndpoint = createTodo("Implement GET HTTP method get all todos endpoint",
                     "The endpoint must use GET HTTP method to return all todos for a specified user. The user id must be sent as query parameter to this endpoint.",
                     userEdiPop,
-                    "07.05.2024");
+                    "07.05.2024",
+                    Status.CLOSED,
+                    Priority.PRIO_2);
             Todo todoImplementSortingFunction = createTodo("Implement sorting function",
                     "Implement a sorting function to sort all todos by the due date field",
                     userEdiPop,
-                    "25.08.2024");
+                    "25.08.2024",
+                    Status.IN_PROGRESS,
+                    Priority.PRIO_1);
 
             userEdiPop.getTodos().add(todoFixDescriptionDisplay);
             userEdiPop.getTodos().add(todoImplementGetAllTodosEndpoint);
@@ -75,12 +83,19 @@ public class InitialDataLoader implements CommandLineRunner {
         return user;
     }
 
-    private Todo createTodo(String title, String description, User user, String dueDate) {
+    private Todo createTodo(String title,
+                            String description,
+                            User user,
+                            String dueDate,
+                            Status status,
+                            Priority priority) {
         Todo todo = new Todo();
         todo.setTodoTitle(title);
         todo.setTodoDescription(description);
         todo.setUser(user);
         todo.setDueDate(LocalDate.parse(dueDate, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        todo.setStatus(status);
+        todo.setPriority(priority);
 
         return todo;
     }

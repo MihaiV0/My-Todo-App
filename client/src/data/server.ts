@@ -51,7 +51,12 @@ async function loginUserOnServer(usernameOrEmail: string, password: string) {
     return response.json();
 }
 
-async function addUserTodo(username: string, title: string, description: string, dueDate: string) {
+async function addUserTodo(username: string, 
+                           title: string, 
+                           description: string, 
+                           dueDate: string, 
+                           status: string, 
+                           priority: string) {
 
     const response = await fetch(`${serverURL}todos/add`, {
         "method": 'POST',
@@ -62,7 +67,9 @@ async function addUserTodo(username: string, title: string, description: string,
             "title": title,
             "description": description,
             "username": username,
-            "dueDate": dueDate
+            "dueDate": dueDate,
+            "status": status,
+            "priority": priority
         })
     });
 
@@ -89,7 +96,12 @@ async function getAllUserTodo(username: string) {
     return response.json();
 }
 
-async function editUserTodo(title: string, description: string, todoId: number, dueDate: string) {
+async function editUserTodo(title: string, 
+                            description: string, 
+                            todoId: number, 
+                            dueDate: string, 
+                            status: string,
+                            priority: string) {
 
     const response = await fetch(`${serverURL}todos/edit?id=${todoId}`, {
         "method": 'PATCH',
@@ -99,7 +111,9 @@ async function editUserTodo(title: string, description: string, todoId: number, 
         "body": JSON.stringify({
             "title": title,
             "description": description,
-            "dueDate": dueDate
+            "dueDate": dueDate,
+            "status": status,
+            "priority": priority
         })
     });
 

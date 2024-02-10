@@ -1,6 +1,8 @@
 package com.server.todoapp.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.server.todoapp.domain.data.types.Priority;
+import com.server.todoapp.domain.data.types.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +30,12 @@ public class Todo {
 
     @Column
     private LocalDate dueDate;
+
+    @Column
+    private Status status;
+
+    @Column
+    private Priority priority;
 
     @JsonIgnoreProperties("todos")
     @ManyToOne

@@ -2,8 +2,6 @@ package com.server.todoapp.domain.dto;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
 public class TodoPostRequest {
 
@@ -14,4 +12,8 @@ public class TodoPostRequest {
     private String username;
 
     private String dueDate;
+
+    private String status;
+
+    private String priority;
 }
