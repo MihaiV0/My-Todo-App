@@ -11,6 +11,7 @@ import DeleteTodoPopup from '@/components/DeleteTodoPopup.vue';
 import CustomInput from '@/components/CustomInput.vue';
 import { useDateFormat, useNow } from '@vueuse/core';
 import DropDown from '@/components/DropDown.vue';
+import FilterTodosPopup from '@/components/FilterTodosPopup.vue';
 
 interface Todo {
     todoId: number;
@@ -44,7 +45,7 @@ function updateTodosFromServer() {
         });
 }
 
-function updateTodosFromServerAndSort() {
+function updateTodosFromServerAndSortFilter() {
     getAllUserTodo(localStorage.getItem('username') || '')
         .then((res: Array<Todo>) => {
             todos.value = [];
@@ -53,6 +54,7 @@ function updateTodosFromServerAndSort() {
                 todos.value.push(todo);
             });
             sortTodos();
+            filterTodos();
         })
         .catch(err => {
             errorMessage.value = err.message;
@@ -79,6 +81,12 @@ const sorting = ref('No sorting');
 const searchText = ref('');
 const status = ref('');
 const priority = ref('');
+const mShowFilterTodosPopup = ref(false);
+const mFilterPrio1s = ref(false);
+const mFilterPrio2s = ref(false);
+const mFilterOpen = ref(false);
+const mFilterInProgress = ref(false);
+const mFilterClosed = ref(false);
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -147,12 +155,8 @@ function cancel() {
 function saveTodo() {
     if (currentOperation.value == 'add') {
         if (todoTitle.value && todoDescription.value && dueDate.value) {
-            addUserTodo(localStorage.getItem('username') || '', 
-                        todoTitle.value, 
-                        todoDescription.value, 
-                        dueDate.value,
-                        status.value,
-                        priority.value)
+            addUserTodo(localStorage.getItem('username') || '', todoTitle.value, todoDescription.value, 
+                        dueDate.value, status.value, priority.value)
                 .then((res: Todo) => {
                     todos.value.pop();
                     todos.value.push(res);
@@ -176,12 +180,8 @@ function saveTodo() {
         }
     } else if (currentOperation.value == 'edit') {
         if (todoTitle.value && todoDescription.value && dueDate.value) {
-            editUserTodo(todoTitle.value, 
-                         todoDescription.value, 
-                         activeTodoId.value, 
-                         dueDate.value, 
-                         status.value, 
-                         priority.value)
+            editUserTodo(todoTitle.value, todoDescription.value, activeTodoId.value, 
+                         dueDate.value, status.value, priority.value)
                 .then((res: Todo) => {
                     const index = todos.value.findIndex(todo => todo.todoId == res.todoId);
                     if (index != -1) {
@@ -285,7 +285,7 @@ function search(newSearchText: string) {
 
 function searchTodoByTitleAndSort() {
     if (!searchText.value) {
-        updateTodosFromServerAndSort();
+        updateTodosFromServerAndSortFilter();
     } else {
         searchTodo(searchText.value, localStorage.getItem('username') || '')
             .then((res: Array<Todo>) => {
@@ -293,6 +293,7 @@ function searchTodoByTitleAndSort() {
                 if (sorting.value != 'No sorting') {
                     sortTodos();
                 }
+                filterTodos();
             });
     }
 }
@@ -308,7 +309,11 @@ function updateSortingAndSortTodos(newSorting: string) {
 
 function sortTodos() {
     switch(sorting.value) {
-        case 'No sorting': updateTodosFromServer();
+        case 'No sorting': 
+            if (!mFilterPrio1s.value && !mFilterPrio2s.value && !mFilterOpen.value &&
+                !mFilterInProgress.value && !mFilterClosed.value) {
+                updateTodosFromServer();
+            }
             break;
         case 'Due date': todos.value.sort((a: Todo, b: Todo) => 
             new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
@@ -327,6 +332,43 @@ function statusChanged(newStatus: string) {
 
 function priorityChanged(newPriority: string) {
     priority.value = newPriority;
+}
+
+function showFilterTodosPopup() {
+    mShowFilterTodosPopup.value = true;
+}
+
+function hideFilterTodosPopup() {
+    mShowFilterTodosPopup.value = false;
+}
+
+function filterTodos() {
+    if (mFilterPrio1s.value) {
+        todos.value = todos.value.filter(todo => todo.priority == 'PRIO 1');
+    } else if (mFilterPrio2s.value) {
+        todos.value = todos.value.filter(todo => todo.priority == 'PRIO 2');
+    }
+    if (mFilterOpen.value) {
+        todos.value = todos.value.filter(todo => todo.status == 'OPEN');
+    } else if (mFilterInProgress.value) {
+        todos.value = todos.value.filter(todo => todo.status == 'IN PROGRESS');
+    } else if (mFilterClosed.value) {
+        todos.value = todos.value.filter(todo => todo.status == 'CLOSED');
+    }
+}
+
+function filterTodosAction(filterPrio1s: boolean, 
+                           filterPrio2s: boolean, 
+                           filterOpen: boolean, 
+                           filterInProgress: boolean, 
+                           filterClosed: boolean) {
+    mFilterPrio1s.value = filterPrio1s;
+    mFilterPrio2s.value = filterPrio2s;
+    mFilterOpen.value = filterOpen;
+    mFilterInProgress.value = filterInProgress;
+    mFilterClosed.value = filterClosed;
+    updateTodosFromServerAndSortFilter();
+    hideFilterTodosPopup();
 }
 
 </script>
@@ -398,6 +440,10 @@ function priorityChanged(newPriority: string) {
                     :enabled="true"
                 />
             </div>
+            <ToolbarSeparator />
+            <ToolbarButtonBase @click="showFilterTodosPopup">
+                Filtering options
+            </ToolbarButtonBase>
         </ToolbarBase>
         <div id="my-todos-container">
             <TodoPanel 
@@ -431,6 +477,16 @@ function priorityChanged(newPriority: string) {
             :show-popup="showDeletePopup"
             @cancel="cancelDeleteTodo"
             @delete-todo="actionDeleteTodo"
+        />
+        <FilterTodosPopup
+            :show-popup="mShowFilterTodosPopup"
+            @cancel="hideFilterTodosPopup"
+            @filter-todos="filterTodosAction"
+            :filter-prio1s="mFilterPrio1s"
+            :filter-prio2s="mFilterPrio2s"
+            :filter-open="mFilterOpen"
+            :filter-in-progress="mFilterInProgress"
+            :filter-closed="mFilterClosed"
         />
     </Teleport>
 </template>
