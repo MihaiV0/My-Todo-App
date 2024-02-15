@@ -1,5 +1,6 @@
 package com.server.todoapp.application;
 
+import com.server.todoapp.application.todo.helper.TodoHelper;
 import com.server.todoapp.domain.data.types.Priority;
 import com.server.todoapp.domain.data.types.Status;
 import com.server.todoapp.domain.dto.TodoPatchRequest;
@@ -45,8 +46,10 @@ public class TodoServiceImpl implements TodoService {
         todo.setTodoDescription(request.getDescription());
         todo.setUser(user);
         todo.setDueDate(LocalDate.parse(request.getDueDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        todo.setStatus(Status.valueOf(replaceSpacesWithUnderscores(request.getStatus()).toUpperCase()));
-        todo.setPriority(Priority.valueOf(replaceSpacesWithUnderscores(request.getPriority()).toUpperCase()));
+        todo.setStatus(Status.valueOf(TodoHelper.replaceSpacesWithUnderscores(
+                request.getStatus()).toUpperCase()));
+        todo.setPriority(Priority.valueOf(TodoHelper.replaceSpacesWithUnderscores(
+                request.getPriority()).toUpperCase()));
 
         if (user.getTodos() == null) {
             user.setTodos(new ArrayList<>());
@@ -62,7 +65,8 @@ public class TodoServiceImpl implements TodoService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found!"));
 
-        return convertListOfTodoToListOfTodoResponse(todoRepository.getAllTodosForUser(user.getId()));
+        return TodoHelper.convertListOfTodoToListOfTodoResponse(todoRepository.getAllTodosForUser(user.getId()),
+                modelMapper);
     }
 
     @Override
@@ -81,10 +85,12 @@ public class TodoServiceImpl implements TodoService {
             todo.setDueDate(LocalDate.parse(request.getDueDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         }
         if (request.getStatus() != null) {
-            todo.setStatus(Status.valueOf(replaceSpacesWithUnderscores(request.getStatus()).toUpperCase()));
+            todo.setStatus(Status.valueOf(TodoHelper.replaceSpacesWithUnderscores(
+                    request.getStatus()).toUpperCase()));
         }
         if (request.getPriority() != null) {
-            todo.setPriority(Priority.valueOf(replaceSpacesWithUnderscores(request.getPriority()).toUpperCase()));
+            todo.setPriority(Priority.valueOf(TodoHelper.replaceSpacesWithUnderscores(
+                    request.getPriority()).toUpperCase()));
         }
 
         return modelMapper.map(todoRepository.save(todo), TodoResponse.class);
@@ -105,26 +111,7 @@ public class TodoServiceImpl implements TodoService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found!"));
 
-        return convertListOfTodoToListOfTodoResponse(todoRepository.searchForTodo(text, user.getId()));
-    }
-
-    private List<TodoResponse> convertListOfTodoToListOfTodoResponse(List<Todo> allTodos) {
-        List<TodoResponse> todoResponses = new ArrayList<>();
-        for (int i = 0; i < allTodos.size(); i++) {
-            todoResponses.add(modelMapper.map(allTodos.get(i), TodoResponse.class));
-        }
-
-        return todoResponses;
-    }
-
-    private String replaceSpacesWithUnderscores(String initial) {
-        StringBuilder sb = new StringBuilder();
-        String[] parts = initial.split(" ");
-        sb.append(parts[0]);
-        for (int i = 1; i < parts.length; i++) {
-            sb.append("_");
-            sb.append(parts[i]);
-        }
-        return sb.toString();
+        return TodoHelper.convertListOfTodoToListOfTodoResponse(todoRepository.searchForTodo(text, user.getId()),
+                modelMapper);
     }
 }

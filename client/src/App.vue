@@ -23,16 +23,16 @@ const showNavbar = computed(() => {
 });
 
 router.beforeEach((to, from) => {
+    if (from.path == '/login' && to.path == '/my-todos') {
+        username.value = localStorage.getItem('username') || 'Username not found';
+    }
+
     if ((to.path == '/my-todos' || 
         to.path == '/my-profile' || 
         to.path == '/projects') && 
         !localStorage.getItem('username')
     ) {
       router.push(from.path);
-    }
-
-    if (from.path == '/login' && to.path == '/my-todos') {
-        username.value = localStorage.getItem('username') || 'Username not found';
     }
 });
 

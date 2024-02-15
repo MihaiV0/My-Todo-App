@@ -1,4 +1,4 @@
-package com.server.todoapp.utils;
+package com.server.todoapp.exception.handler;
 
 import com.server.todoapp.domain.exception.*;
 import org.springframework.http.HttpStatus;
