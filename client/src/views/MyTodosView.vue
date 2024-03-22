@@ -518,17 +518,14 @@ function checkFiltersActive() {
 
     .green-sign {
         color: #007900;
-        font-size: inherit;
     }
 
     .blue-sign {
         color: #00129b;
-        font-size: inherit;
     }
 
     .red-sign {
         color: #C30000;
-        font-size: inherit;
     }
 
     #sorting-tools {

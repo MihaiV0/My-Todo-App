@@ -33,4 +33,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTodoNotFoundException(TodoNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(value = ApiException.class)
+    public ResponseEntity<String> handleApiException(ApiException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

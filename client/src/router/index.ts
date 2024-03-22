@@ -1,6 +1,6 @@
+import GroupsView from '@/views/GroupsView.vue'
 import MyProfileView from '@/views/MyProfileView.vue'
 import MyTodosView from '@/views/MyTodosView.vue'
-import ProjectsView from '@/views/ProjectsView.vue'
 import RegisterSuccessView from '@/views/RegisterSuccessView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
@@ -35,9 +35,9 @@ const router = createRouter({
       component: MyTodosView
     },
     {
-      path: '/projects',
-      name: 'projects',
-      component: ProjectsView
+      path: '/groups',
+      name: 'groups',
+      component: GroupsView
     },
     {
       path: '/my-profile',

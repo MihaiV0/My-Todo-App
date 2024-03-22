@@ -47,6 +47,9 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Todo> todos;
 
+    @ManyToMany(mappedBy = "members")
+    private List<Group> groups;
+
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;

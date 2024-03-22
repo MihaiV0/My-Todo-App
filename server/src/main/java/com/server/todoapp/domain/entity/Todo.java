@@ -41,9 +41,4 @@ public class Todo {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-
-    public Todo(String todoTitle, String todoDescription) {
-        this.todoTitle = todoTitle;
-        this.todoDescription = todoDescription;
-    }
 }

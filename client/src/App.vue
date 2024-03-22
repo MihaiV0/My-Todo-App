@@ -29,7 +29,7 @@ router.beforeEach((to, from) => {
 
     if ((to.path == '/my-todos' || 
         to.path == '/my-profile' || 
-        to.path == '/projects') && 
+        to.path == '/groups') && 
         !localStorage.getItem('username')
     ) {
       router.push(from.path);
@@ -63,10 +63,10 @@ function logout() {
             />
             <NavSeparator />
             <NavButton
-                text="Projects"
-                @button-click="$router.push('/projects')"
-                :highlighted="currentRoute == '/projects'"
-                :show-projects-icon="true"
+                text="Groups"
+                @button-click="$router.push('/groups')"
+                :highlighted="currentRoute == '/groups'"
+                :show-groups-icon="true"
             />
             <NavSeparator />
             <NavButton

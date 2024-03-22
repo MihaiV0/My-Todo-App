@@ -5,7 +5,7 @@ const props = defineProps({
     showProfileIcon: Boolean,
     showLogoutIcon: Boolean,
     showTodoIcon: Boolean,
-    showProjectsIcon: Boolean,
+    showGroupsIcon: Boolean,
 });
 
 const emits = defineEmits(['button-click']);
@@ -37,9 +37,9 @@ const emits = defineEmits(['button-click']);
         </span>
         <span 
             class="material-symbols-outlined"
-            v-show="showProjectsIcon"
+            v-show="showGroupsIcon"
         >
-            communities
+            groups_3
         </span>
         {{ text }}
     </button>

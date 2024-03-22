@@ -156,6 +156,37 @@ async function searchTodo(text: string, username: string) {
     return response.json();
 }
 
+async function loadAllGroups() {
+
+    const response = await fetch(`${serverURL}groups/all`, {
+        "method": 'GET',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    return response.json();
+}
+
+async function addGroup(groupName: string) {
+
+    const response = await fetch(`${serverURL}groups/add`, {
+        "method": 'POST',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+        "body": JSON.stringify({
+            "groupName": groupName
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('Group already exists!');
+    }
+
+    return response.json();
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -166,11 +197,10 @@ function clearUserData() {
 }
 
 export {
-    addUserTodo,
+    addGroup, addUserTodo,
     clearUserData,
     editUserTodo,
-    getAllUserTodo,
-    loginUserOnServer,
+    getAllUserTodo, loadAllGroups, loginUserOnServer,
     registerUserOnServer,
     saveUserData,
     searchTodo,
