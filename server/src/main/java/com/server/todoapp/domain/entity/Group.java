@@ -1,5 +1,6 @@
 package com.server.todoapp.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,4 +39,8 @@ public class Group {
             inverseJoinColumns = { @JoinColumn(name = "id") }
     )
     private List<User> members;
+
+    @JsonIgnoreProperties("group")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "group")
+    private List<Message> messages;
 }

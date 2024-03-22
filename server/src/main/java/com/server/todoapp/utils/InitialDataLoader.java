@@ -1,11 +1,14 @@
 package com.server.todoapp.utils;
 
+import com.server.todoapp.application.api.helper.ApiHelper;
 import com.server.todoapp.domain.data.types.Priority;
 import com.server.todoapp.domain.data.types.Status;
 import com.server.todoapp.domain.entity.Group;
+import com.server.todoapp.domain.entity.Message;
 import com.server.todoapp.domain.entity.Todo;
 import com.server.todoapp.domain.entity.User;
 import com.server.todoapp.domain.repository.GroupRepository;
+import com.server.todoapp.domain.repository.MessageRepository;
 import com.server.todoapp.domain.repository.TodoRepository;
 import com.server.todoapp.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,9 +18,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class InitialDataLoader implements CommandLineRunner {
@@ -28,16 +31,19 @@ public class InitialDataLoader implements CommandLineRunner {
 
     private final GroupRepository groupRepository;
 
+    private final MessageRepository messageRepository;
+
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
     @Value("${security.bcrypt.salt}")
     private String bcryptSalt;
 
-    public InitialDataLoader(UserRepository userRepository, TodoRepository todoRepository, GroupRepository groupRepository) {
+    public InitialDataLoader(UserRepository userRepository, TodoRepository todoRepository, GroupRepository groupRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.todoRepository = todoRepository;
         this.groupRepository = groupRepository;
+        this.messageRepository = messageRepository;
     }
 
     @Transactional
@@ -118,6 +124,36 @@ public class InitialDataLoader implements CommandLineRunner {
             group7.getMembers().add(userVoicuAna);
             group7.getMembers().add(userTudoseVera);
 
+            Message msg1 = createMessage("I'll be late today. Prepare the presentation until I arrive.",
+                    ApiHelper.replaceUnderscoresWithSpaces(userEdiPop.getUsername()),
+                    "01-12-2018 09:45:03");
+            msg1.setGroup(group1);
+            group1.getMessages().add(msg1);
+
+            Message msg2 = createMessage("Ok, do you need me to do anything else?",
+                    ApiHelper.replaceUnderscoresWithSpaces(userVoicuAna.getUsername()),
+                    "01-12-2018 09:50:18");
+            msg2.setGroup(group1);
+            group1.getMessages().add(msg2);
+
+            Message msg3 = createMessage("Changed my mind. I don't want to do the presentation right now. Is that ok for you?",
+                    ApiHelper.replaceUnderscoresWithSpaces(userVoicuAna.getUsername()),
+                    "01-12-2018 09:51:33");
+            msg3.setGroup(group1);
+            group1.getMessages().add(msg3);
+
+            Message msg4 = createMessage("No, the presentation will take place as discussed in yesterday's team meeting",
+                    ApiHelper.replaceUnderscoresWithSpaces(userEdiPop.getUsername()),
+                    "01-12-2018 09:55:06");
+            msg4.setGroup(group1);
+            group1.getMessages().add(msg4);
+
+            Message msg5 = createMessage("Morning everybody. I'm not sure I'll get in time for today's presentation. I'll let you know if that's the case.",
+                    ApiHelper.replaceUnderscoresWithSpaces(userEdiPop.getUsername()),
+                    "01-12-2018 09:13:57");
+            msg5.setGroup(group1);
+            group1.getMessages().add(msg5);
+
             userEdiPop.getTodos().add(todoFixDescriptionDisplay);
             userEdiPop.getTodos().add(todoImplementGetAllTodosEndpoint);
             userEdiPop.getTodos().add(todoImplementSortingFunction);
@@ -141,6 +177,8 @@ public class InitialDataLoader implements CommandLineRunner {
             groupRepository.save(group6);
             groupRepository.save(group7);
 
+            messageRepository.save(msg1);
+            messageRepository.save(msg2);
         }
     }
 
@@ -175,7 +213,17 @@ public class InitialDataLoader implements CommandLineRunner {
         Group group = new Group();
         group.setGroupName(groupName);
         group.setMembers(new ArrayList<>());
+        group.setMessages(new ArrayList<>());
 
         return group;
+    }
+
+    private Message createMessage(String messageText, String username, String dateTime) {
+        Message message = new Message();
+        message.setMessage(messageText);
+        message.setUsername(username);
+        message.setDateTime(DateUtils.parseDateTime(dateTime));
+
+        return message;
     }
 }

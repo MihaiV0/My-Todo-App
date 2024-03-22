@@ -47,6 +47,7 @@ public class GroupServiceImpl implements GroupService {
 
         Group group = new Group();
         group.setGroupName(request.getGroupName());
+        group.setMessages(new ArrayList<>());
 
         if (group.getMembers() == null) {
             group.setMembers(new ArrayList<>());

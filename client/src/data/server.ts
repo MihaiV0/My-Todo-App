@@ -187,6 +187,17 @@ async function addGroup(groupName: string) {
     return response.json();
 }
 
+async function loadMessages(groupName: string) {
+    const response = await fetch(`${serverURL}messages/all?group=${groupName}`, {
+        "method": 'GET',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    return response.json();
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -200,7 +211,7 @@ export {
     addGroup, addUserTodo,
     clearUserData,
     editUserTodo,
-    getAllUserTodo, loadAllGroups, loginUserOnServer,
+    getAllUserTodo, loadAllGroups, loadMessages, loginUserOnServer,
     registerUserOnServer,
     saveUserData,
     searchTodo,

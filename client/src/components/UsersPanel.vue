@@ -36,7 +36,7 @@ function replaceUnderscoresWithSpaces(nameWithUnderscores: String) {
         width: 20vw;
         display: flex;
         flex-direction: column;
-        border-left: 1px solid var(--main-color);
+        border-left: var(--todo-panel-border-right-width) solid var(--main-color);
         overflow: auto;
         background-color: var(--grey-secondary-color);
         position: absolute;

@@ -1,6 +1,5 @@
 package com.server.todoapp.domain.dto;
 
-import com.server.todoapp.domain.entity.User;
 import lombok.Data;
 
 import java.util.List;
@@ -13,4 +12,6 @@ public class GroupResponse {
     private String groupName;
 
     private List<String> members;
+
+    private List<GroupMessage> messages;
 }

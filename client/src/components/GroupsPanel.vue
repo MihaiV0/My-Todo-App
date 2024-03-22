@@ -46,7 +46,7 @@ function changeSelectedGroup(groupName: string) {
         width: 20vw;
         display: flex;
         flex-direction: column;
-        border-right: 1px solid var(--main-color);
+        border-right: var(--todo-panel-border-right-width) solid var(--main-color);
         overflow: auto;
         background-color: var(--grey-secondary-color);
     }
