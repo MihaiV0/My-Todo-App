@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { transform } from 'typescript';
-import { computed } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 
 interface Message {
     message: string,
@@ -15,6 +15,8 @@ const mProps = defineProps({
     }
 })
 
+const mMessageText = ref('');
+
 function replaceUnderscoresWithSpaces(nameWithUnderscores: String) {
     const nameParts = nameWithUnderscores.split('_');
     let nameWithSpaces = nameParts[0];
@@ -25,7 +27,17 @@ function replaceUnderscoresWithSpaces(nameWithUnderscores: String) {
     return nameWithSpaces;
 }
 
+const mEmits = defineEmits(['send-message'])
+
 const mCurrentUser = computed(() => replaceUnderscoresWithSpaces(localStorage.getItem('username') || ''))
+
+function sendMessage() {
+    if (mMessageText.value) {
+        mEmits('send-message', mMessageText.value, mCurrentUser.value)
+        mMessageText.value = ''
+    }
+}
+
 </script>
 
 <template>
@@ -55,6 +67,21 @@ const mCurrentUser = computed(() => replaceUnderscoresWithSpaces(localStorage.ge
                 </div>
             </div>
         </div>
+        <div id="input-container">
+            <input 
+                type="text"
+                placeholder="Message"
+                v-model="mMessageText"
+                @keydown.enter="sendMessage"
+            >
+            <span 
+                class="material-symbols-outlined"
+                id="send-btn"
+                @click="sendMessage"
+            >
+                send
+            </span>
+        </div>
     </div>
 </template>
 
@@ -62,6 +89,20 @@ const mCurrentUser = computed(() => replaceUnderscoresWithSpaces(localStorage.ge
     #chat-container {
         width: calc(60vw - 2 * var(--todo-panel-border-right-width));
         background-color: white;
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+    }
+    
+    #send-btn {
+        background-color: var(--main-color);
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    #send-btn:hover {
+        cursor: pointer;
     }
 
     #message-container {
@@ -69,7 +110,32 @@ const mCurrentUser = computed(() => replaceUnderscoresWithSpaces(localStorage.ge
         flex-direction: column;
         gap: 1vh;
         overflow: auto;
-        transform: translateY(4%);
+        height: 90%;
+        margin: 1vh 0;
+    }
+
+    #input-container {
+        height: 10%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5vw;
+        background-color: var(--grey-secondary-color);
+    }
+
+    input {
+        outline: none;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 15px;
+        font-size: var(--default-font-size);
+        width: 80%;
+        border: 1px solid transparent;
+        color: var(--main-color);
+    }
+
+    input:focus {
+        border-color: var(--main-color);
     }
 
     .message {

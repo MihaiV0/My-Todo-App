@@ -6,7 +6,7 @@ import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
 import UsersPanel from '@/components/UsersPanel.vue';
 import GroupChat from '@/components/GroupChat.vue';
-import { addGroup, loadAllGroups, loadMessages } from '@/data/server';
+import { addGroup, addMessage, loadAllGroups, loadMessages } from '@/data/server';
 import { computed, onMounted, ref } from 'vue';
 
 interface Message {
@@ -51,6 +51,11 @@ function hideCreateGroupPopup() {
 
 function changeActiveGroupId(groupName: string) {
     mActiveGroupName.value = groupName;
+    updateMessages(groupName);
+    setTimeout(scrollToBottomOfChat, 0.001)
+}
+
+function updateMessages(groupName: string) {
     loadMessages(groupName)
         .then((res: Message[]) => {
             mGroups.value[mActiveGroupIndex.value].messages = res;
@@ -71,6 +76,19 @@ function saveGroup(groupName: string) {
 
 function hideErrorMessagePopup() {
     mShowErrorMessagePopup.value = false;
+}
+
+function saveMessageAndReloadChatMessages(messageText: string, username: string) {
+    addMessage(mActiveGroupName.value, username, messageText)
+        .then((res: Message) => {
+            updateMessages(mActiveGroupName.value)
+        })
+    setTimeout(scrollToBottomOfChat, 40)
+}
+
+function scrollToBottomOfChat() {
+    const messageContainer = document.getElementById('message-container')
+    messageContainer.scrollTop = messageContainer.scrollHeight
 }
 
 </script>
@@ -96,13 +114,21 @@ function hideErrorMessagePopup() {
             />
             <GroupChat 
                 :messages="mActiveGroupIndex > -1 ? mGroups[mActiveGroupIndex].messages : []" 
+                @send-message="saveMessageAndReloadChatMessages"
             />
         </div>
     </div>
     <Teleport to="body">
-        <AddNewGroupPopup :show-popup="mShowAddGroupPopup" @close="hideCreateGroupPopup" @save-group="saveGroup" />
-        <ErrorMessagePopup error-text="Group already exists" :show-popup="mShowErrorMessagePopup"
-            @close="hideErrorMessagePopup" />
+        <AddNewGroupPopup 
+            :show-popup="mShowAddGroupPopup" 
+            @close="hideCreateGroupPopup" 
+            @save-group="saveGroup" 
+        />
+        <ErrorMessagePopup 
+            error-text="Group already exists" 
+            :show-popup="mShowErrorMessagePopup"
+            @close="hideErrorMessagePopup" 
+        />
     </Teleport>
 </template>
 

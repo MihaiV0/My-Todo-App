@@ -19,9 +19,7 @@ public class ApiHelper {
         List<V> allItemsConverted = new ArrayList<>();
         for (int i = 0; i < allItems.size(); i++) {
             if (destinationType == GroupMessage.class) {
-                GroupMessage groupMessage = modelMapper.map(allItems.get(i), GroupMessage.class);
-                groupMessage.setDateTime(DateUtils.getDateAndTime(((Message) allItems.get(i)).getDateTime()));
-                allItemsConverted.add((V) groupMessage);
+                allItemsConverted.add((V) convertMessageToGroupMessage((Message) allItems.get(i), modelMapper));
             } else if (destinationType == GroupResponse.class) {
                 allItemsConverted.add((V) convertGroupToGroupResponse((Group) allItems.get(i)));
             } else {
@@ -72,5 +70,11 @@ public class ApiHelper {
             response.getMessages().add(message);
         }
         return response;
+    }
+
+    public static GroupMessage convertMessageToGroupMessage(Message msg, ModelMapper modelMapper) {
+        GroupMessage groupMessage = modelMapper.map(msg, GroupMessage.class);
+        groupMessage.setDateTime(DateUtils.getDateAndTime((msg.getDateTime())));
+        return groupMessage;
     }
 }

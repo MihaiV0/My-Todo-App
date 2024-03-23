@@ -198,6 +198,23 @@ async function loadMessages(groupName: string) {
     return response.json();
 }
 
+async function addMessage(groupName: string, username: string, message: string) {
+
+    const response = await fetch(`${serverURL}messages/add`, {
+        "method": 'POST',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+        "body": JSON.stringify({
+            "groupName": groupName,
+            "message": message,
+            "username": username,
+        })
+    });
+
+    return response.json();
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -208,7 +225,7 @@ function clearUserData() {
 }
 
 export {
-    addGroup, addUserTodo,
+    addGroup, addMessage, addUserTodo,
     clearUserData,
     editUserTodo,
     getAllUserTodo, loadAllGroups, loadMessages, loginUserOnServer,
