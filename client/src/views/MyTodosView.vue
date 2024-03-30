@@ -88,6 +88,7 @@ const mFilterOpen = ref(false);
 const mFilterInProgress = ref(false);
 const mFilterClosed = ref(false);
 const mFiltersActive = ref(false);
+const mShowCopyToClipboardToaster = ref(false);
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -381,6 +382,13 @@ function checkFiltersActive() {
     }
 }
 
+function showCopyToClipboardToaster() {
+    mShowCopyToClipboardToaster.value = true
+    setTimeout(() => {
+        mShowCopyToClipboardToaster.value = false
+    }, 2000)
+}
+
 </script>
 
 <template>
@@ -478,6 +486,7 @@ function checkFiltersActive() {
                 @date-changed="dateChanged"
                 @status-changed="statusChanged"
                 @priority-changed="priorityChanged"
+                @copy-successful="showCopyToClipboardToaster"
             />
         </div>
     </div>
@@ -502,6 +511,15 @@ function checkFiltersActive() {
             :filter-in-progress="mFilterInProgress"
             :filter-closed="mFilterClosed"
         />
+        <div 
+            v-show="mShowCopyToClipboardToaster"
+            id="copy-to-clipboard-toaster"
+        >
+            <span class="material-symbols-outlined">
+                info
+            </span>
+            Link copied to clipboard
+        </div>
     </Teleport>
 </template>
 
@@ -510,6 +528,21 @@ function checkFiltersActive() {
         display: flex;
         height: calc(100vh - var(--navbar-height) - var(--navbar-border-bottom-height) - var(--toolbar-height) 
             - var(--toolbar-border-bottom-height));
+    }
+
+    #copy-to-clipboard-toaster {
+        position: absolute;
+        bottom: 5vh;
+        left: 43vw;
+        padding: 10px;
+        background-color: var(--main-color);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 7px;
+        box-shadow: inset;
+        gap: 0.2vw;
     }
 
     #my-todos {

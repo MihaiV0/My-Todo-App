@@ -17,7 +17,7 @@ const props = defineProps({
     priority: String,
 });
 
-const emits = defineEmits(['title-changed', 'description-changed', "date-changed", "status-changed", "priority-changed"]);
+const emits = defineEmits(['title-changed', 'description-changed', "date-changed", "status-changed", "priority-changed", 'copy-successful']);
 
 function titleChanged(newTitle: string) {
     titleText.value = newTitle;
@@ -79,7 +79,7 @@ function copyToClipboard(text: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         const textarea = document.createElement('textarea');
         textarea.value = text;
-        textarea.style.position = 'fixed'; // Avoid scrolling to bottom
+        textarea.style.position = 'fixed';
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
@@ -89,6 +89,7 @@ function copyToClipboard(text: string): Promise<void> {
             if (!successful) {
                 reject(new Error('Unable to copy to clipboard'));
             } else {
+                emits('copy-successful');
                 resolve();
             }
         } catch (err) {
