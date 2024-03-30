@@ -139,7 +139,7 @@ function leaveGroup() {
         <ToolbarBase>
             <ToolbarButtonBase @click="showCreateGroupPopup">
                 <span class="material-symbols-outlined green-sign">
-                    group_add
+                    add
                 </span>
                 Create new group
             </ToolbarButtonBase>
@@ -148,7 +148,7 @@ function leaveGroup() {
                 @click="joinGroup"
                 v-show="!mIsCurrentUserPartOfGroup && mActiveGroupIndex > -1"
             >
-                <span class="material-symbols-outlined">
+                <span class="material-symbols-outlined green-sign">
                     person_add
                 </span>
                 Join group
@@ -157,7 +157,7 @@ function leaveGroup() {
                 @click="leaveGroup"
                 v-show="mIsCurrentUserPartOfGroup && mActiveGroupIndex > -1"
             >
-                <span class="material-symbols-outlined">
+                <span class="material-symbols-outlined red-sign">
                     person_remove
                 </span>
                 Leave group
@@ -206,5 +206,9 @@ function leaveGroup() {
         display: flex;
         height: calc(100vh - var(--navbar-height) - var(--navbar-border-bottom-height) - var(--toolbar-height) 
             - var(--toolbar-border-bottom-height));
+    }
+
+    .red-sign {
+        color: #C30000;
     }
 </style>

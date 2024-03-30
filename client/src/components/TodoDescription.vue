@@ -6,6 +6,7 @@ import CustomSizeTextarea from './CustomSizeTextarea.vue';
 import VueFlatpickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.min.css';
 import DropDown from '@/components/DropDown.vue';
+import FixedSizeSpan from '@/components/FixedSizeSpan.vue';
 
 const props = defineProps({
     title: String,
@@ -115,7 +116,9 @@ function copyToClipboard(text: string): Promise<void> {
             </h2>
         </TodoField>
         <TodoField>
-            Status:
+            <FixedSizeSpan>
+                Status:
+            </FixedSizeSpan>
             <DropDown 
                 :values="statusOptions"
                 :initial-value="status"
@@ -126,7 +129,9 @@ function copyToClipboard(text: string): Promise<void> {
             />
         </TodoField>
         <TodoField>
-            Priority:
+            <FixedSizeSpan>
+                Priority:
+            </FixedSizeSpan>
             <DropDown 
                 :values="priorityOptions"
                 :initial-value="priority"
@@ -137,7 +142,9 @@ function copyToClipboard(text: string): Promise<void> {
             />
         </TodoField>
         <TodoField>
-            Due date:
+            <FixedSizeSpan>
+                Due date:
+            </FixedSizeSpan>
             <VueFlatpickr
                 :config="flatpickrConfig"
                 v-model:model-value="selectedDate"
@@ -147,7 +154,9 @@ function copyToClipboard(text: string): Promise<void> {
             />
         </TodoField>
         <TodoField>
-            Title:
+            <FixedSizeSpan>
+                Title:
+            </FixedSizeSpan>
             <CustomInput
                 input-type="text"
                 placeholder-text="Title"
@@ -159,7 +168,9 @@ function copyToClipboard(text: string): Promise<void> {
             />
         </TodoField>
         <TodoField>
-            Description:
+            <FixedSizeSpan>
+                Description:
+            </FixedSizeSpan>
             <CustomSizeTextarea 
                 :col-nr="60"
                 :row-nr="5"
