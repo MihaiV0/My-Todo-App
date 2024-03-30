@@ -12,4 +12,8 @@ public interface GroupService {
     List<GroupResponse> getAllGroups();
 
     GroupResponse insertGroup(String username, GroupPostRequest request) throws ApiException;
+
+    GroupResponse addUserToGroup(String groupName, String username) throws ApiException;
+
+    void removeUserFromGroup(String groupName, String username) throws ApiException;
 }

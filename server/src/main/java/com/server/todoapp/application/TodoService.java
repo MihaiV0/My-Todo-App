@@ -4,6 +4,7 @@ import com.server.todoapp.domain.dto.TodoPatchRequest;
 import com.server.todoapp.domain.dto.TodoPostRequest;
 import com.server.todoapp.domain.dto.TodoResponse;
 import com.server.todoapp.domain.entity.Todo;
+import com.server.todoapp.domain.exception.ApiException;
 import com.server.todoapp.domain.exception.TodoNotFoundException;
 import com.server.todoapp.domain.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
@@ -22,4 +23,6 @@ public interface TodoService {
     void deleteTodo(Integer todoId) throws TodoNotFoundException;
 
     List<TodoResponse> searchTodo(String text, String username) throws UserNotFoundException;
+
+    TodoResponse getTodoById(Integer id) throws ApiException;
 }

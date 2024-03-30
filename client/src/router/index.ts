@@ -2,6 +2,7 @@ import GroupsView from '@/views/GroupsView.vue'
 import MyProfileView from '@/views/MyProfileView.vue'
 import MyTodosView from '@/views/MyTodosView.vue'
 import RegisterSuccessView from '@/views/RegisterSuccessView.vue'
+import TodoView from '@/views/TodoView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
@@ -43,6 +44,11 @@ const router = createRouter({
       path: '/my-profile',
       name: 'my-profile',
       component: MyProfileView
+    },
+    {
+      path: '/todo/:id',
+      name: 'todo',
+      component: TodoView
     },
   ]
 })

@@ -75,6 +75,30 @@ function priorityChanged(newPriority: string) {
     emits('priority-changed', newPriority);
 }
 
+function copyToClipboard(text: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed'; // Avoid scrolling to bottom
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (!successful) {
+                reject(new Error('Unable to copy to clipboard'));
+            } else {
+                resolve();
+            }
+        } catch (err) {
+            reject(err);
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    });
+}
+
 </script>
 
 <template>
@@ -83,7 +107,11 @@ function priorityChanged(newPriority: string) {
         v-show="title || (activeTodoId != -2)"
     >
         <TodoField>
-            <h2>{{ editing ? initialTitle : title }}</h2>
+            <h2 
+                @click="copyToClipboard(`http://localhost:5173/todo/${activeTodoId}`)"
+            >
+                {{ editing ? initialTitle : title }}
+            </h2>
         </TodoField>
         <TodoField>
             Status:
@@ -177,6 +205,11 @@ function priorityChanged(newPriority: string) {
 
     .date-picker:disabled {
         cursor: default;
+    }
+
+    h2:hover {
+        cursor: pointer;
+        text-decoration: underline;
     }
 
 </style>

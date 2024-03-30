@@ -4,6 +4,7 @@ import com.server.todoapp.application.TodoService;
 import com.server.todoapp.domain.dto.TodoPatchRequest;
 import com.server.todoapp.domain.dto.TodoPostRequest;
 import com.server.todoapp.domain.dto.TodoResponse;
+import com.server.todoapp.domain.exception.ApiException;
 import com.server.todoapp.domain.exception.TodoNotFoundException;
 import com.server.todoapp.domain.exception.UserNotFoundException;
 import jakarta.transaction.Transactional;
@@ -56,5 +57,11 @@ public class TodoController {
                                                          @RequestParam("username") String username)
             throws UserNotFoundException {
         return new ResponseEntity<>(todoService.searchTodo(text, username), HttpStatus.OK);
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<TodoResponse> findTodoById(@RequestParam("id") Integer todoId)
+            throws ApiException {
+        return new ResponseEntity<>(todoService.getTodoById(todoId), HttpStatus.OK);
     }
 }

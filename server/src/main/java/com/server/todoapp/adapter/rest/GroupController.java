@@ -34,4 +34,19 @@ public class GroupController {
     public ResponseEntity<List<GroupResponse>> getAllGroups() {
         return new ResponseEntity<>(groupService.getAllGroups(), HttpStatus.OK);
     }
+
+    @PostMapping("/join")
+    public ResponseEntity<GroupResponse> addUserToGroup(@RequestParam("username") String username,
+                                                        @RequestParam("groupName") String groupName)
+            throws ApiException {
+        return new ResponseEntity<>(groupService.addUserToGroup(groupName, username), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<Void> removeUserFromGroup(@RequestParam("username") String username,
+                                                    @RequestParam("groupName") String groupName)
+            throws ApiException {
+        groupService.removeUserFromGroup(groupName, username);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

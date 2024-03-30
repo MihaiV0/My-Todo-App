@@ -6,8 +6,10 @@ import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
 import UsersPanel from '@/components/UsersPanel.vue';
 import GroupChat from '@/components/GroupChat.vue';
-import { addGroup, addMessage, loadAllGroups, loadMessages } from '@/data/server';
-import { computed, onMounted, ref } from 'vue';
+import ToolbarSeparator from '@/components/ToolbarSeparator.vue';
+import { addGroup, addMessage, addUserToGroup, loadAllGroups, loadMessages, removeUserFromGroup } from '@/data/server';
+import { computed, onMounted, ref, watch } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 interface Message {
     message: string,
@@ -26,9 +28,20 @@ const mGroups = ref<Array<Group>>([]);
 const mActiveGroupName = ref('');
 const mShowAddGroupPopup = ref(false);
 const mShowErrorMessagePopup = ref(false);
+const mIsCurrentUserPartOfGroup = computed(() => {
+    if (!mGroups.value[mActiveGroupIndex.value]) {
+        return false
+    }
+    const find = mGroups.value[mActiveGroupIndex.value].members.find(member => member == localStorage.getItem('username'))
+    if (find) {
+        return true
+    }
+    return false
+})
 const mActiveGroupIndex = computed(() => 
     mGroups.value.findIndex(group => group.groupName == mActiveGroupName.value)
 );
+let mTimerIdLoadMessages: number
 
 function loadGroupsFromServer() {
     loadAllGroups()
@@ -40,6 +53,10 @@ function loadGroupsFromServer() {
 onMounted(() => {
     loadGroupsFromServer();
 });
+
+onBeforeRouteLeave(() => {
+    clearInterval(mTimerIdLoadMessages)
+})
 
 function showCreateGroupPopup() {
     mShowAddGroupPopup.value = true;
@@ -91,6 +108,30 @@ function scrollToBottomOfChat() {
     messageContainer.scrollTop = messageContainer.scrollHeight
 }
 
+watch(
+    mActiveGroupIndex, 
+    () => {
+        clearInterval(mTimerIdLoadMessages)
+        mTimerIdLoadMessages = setInterval(() => {
+            updateMessages(mActiveGroupName.value)
+        }, 100)
+    }
+)
+
+function joinGroup() {
+    addUserToGroup(mActiveGroupName.value, localStorage.getItem('username') || '')
+        .then(res => {
+            loadGroupsFromServer()
+        })
+}
+
+function leaveGroup() {
+    removeUserFromGroup(mActiveGroupName.value, localStorage.getItem('username') || '')
+        .then(res => {
+            loadGroupsFromServer()
+        })
+}
+
 </script>
 
 <template>
@@ -101,6 +142,25 @@ function scrollToBottomOfChat() {
                     group_add
                 </span>
                 Create new group
+            </ToolbarButtonBase>
+            <ToolbarSeparator v-show="mActiveGroupIndex > -1"/>
+            <ToolbarButtonBase 
+                @click="joinGroup"
+                v-show="!mIsCurrentUserPartOfGroup && mActiveGroupIndex > -1"
+            >
+                <span class="material-symbols-outlined">
+                    person_add
+                </span>
+                Join group
+            </ToolbarButtonBase>
+            <ToolbarButtonBase 
+                @click="leaveGroup"
+                v-show="mIsCurrentUserPartOfGroup && mActiveGroupIndex > -1"
+            >
+                <span class="material-symbols-outlined">
+                    person_remove
+                </span>
+                Leave group
             </ToolbarButtonBase>
         </ToolbarBase>
         <div id="main-container">
@@ -113,6 +173,7 @@ function scrollToBottomOfChat() {
                 :members="mActiveGroupIndex > -1 ? mGroups[mActiveGroupIndex].members : []" 
             />
             <GroupChat 
+                v-show="mIsCurrentUserPartOfGroup"
                 :messages="mActiveGroupIndex > -1 ? mGroups[mActiveGroupIndex].messages : []" 
                 @send-message="saveMessageAndReloadChatMessages"
             />

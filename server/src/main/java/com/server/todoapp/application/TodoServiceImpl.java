@@ -8,6 +8,7 @@ import com.server.todoapp.domain.dto.TodoPostRequest;
 import com.server.todoapp.domain.dto.TodoResponse;
 import com.server.todoapp.domain.entity.Todo;
 import com.server.todoapp.domain.entity.User;
+import com.server.todoapp.domain.exception.ApiException;
 import com.server.todoapp.domain.exception.TodoNotFoundException;
 import com.server.todoapp.domain.exception.UserNotFoundException;
 import com.server.todoapp.domain.repository.TodoRepository;
@@ -113,5 +114,13 @@ public class TodoServiceImpl implements TodoService {
 
         return ApiHelper.convertListToDestinationType(todoRepository.searchForTodo(text, user.getId()), modelMapper,
                 Todo.class, TodoResponse.class);
+    }
+
+    @Override
+    public TodoResponse getTodoById(Integer id)
+            throws ApiException {
+        Todo todo = todoRepository.findByTodoId(id)
+                .orElseThrow(() -> new ApiException("Todo not found"));
+        return modelMapper.map(todo, TodoResponse.class);
     }
 }

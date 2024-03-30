@@ -215,6 +215,40 @@ async function addMessage(groupName: string, username: string, message: string) 
     return response.json();
 }
 
+async function addUserToGroup(groupName: string, username: string) {
+
+    const response = await fetch(`${serverURL}groups/join?username=${username}&groupName=${groupName}`, {
+        "method": 'POST',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    return response.json();
+}
+
+async function removeUserFromGroup(groupName: string, username: string) {
+
+    const response = await fetch(`${serverURL}groups/remove?username=${username}&groupName=${groupName}`, {
+        "method": 'DELETE',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+}
+
+async function getTodoById(todoId: number) {
+
+    const response = await fetch(`${serverURL}todos/get?id=${todoId}`, {
+        "method": 'GET',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    return response.json();
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -225,12 +259,11 @@ function clearUserData() {
 }
 
 export {
-    addGroup, addMessage, addUserTodo,
+    addGroup, addMessage, addUserToGroup, addUserTodo,
     clearUserData,
     editUserTodo,
-    getAllUserTodo, loadAllGroups, loadMessages, loginUserOnServer,
-    registerUserOnServer,
-    saveUserData,
+    getAllUserTodo, getTodoById, loadAllGroups, loadMessages, loginUserOnServer,
+    registerUserOnServer, removeUserFromGroup, saveUserData,
     searchTodo,
     todoDelete
 };

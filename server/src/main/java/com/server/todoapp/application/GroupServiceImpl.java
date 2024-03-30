@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -61,5 +62,50 @@ public class GroupServiceImpl implements GroupService {
         userRepository.save(user);
 
         return ApiHelper.convertGroupToGroupResponse(groupRepository.save(group));
+    }
+
+    @Override
+    public GroupResponse addUserToGroup(String groupName, String username)
+            throws ApiException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApiException("User " + username + " not found"));
+        Group group = groupRepository.findByGroupName(groupName)
+                .orElseThrow(() -> new ApiException("Group " + groupName + " not found"));
+        for (int i = 0; i < group.getMembers().size(); i++) {
+            if (group.getMembers().get(i).getUsername().equals(username)) {
+                throw new ApiException("User already exists in group");
+            }
+        }
+
+        if (user.getGroups() == null) {
+            user.setGroups(new ArrayList<>());
+        }
+        user.getGroups().add(group);
+
+        if (group.getMembers() == null) {
+            group.setMembers(new ArrayList<>());
+        }
+        group.getMembers().add(user);
+
+        userRepository.save(user);
+        return ApiHelper.convertGroupToGroupResponse(groupRepository.save(group));
+    }
+
+    @Override
+    public void removeUserFromGroup(String groupName, String username)
+            throws ApiException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApiException("User " + username + " not found"));
+        Group group = groupRepository.findByGroupName(groupName)
+                .orElseThrow(() -> new ApiException("Group " + groupName + " not found"));
+        if (!group.getMembers().contains(user)) {
+            throw new ApiException("User is not part of the group");
+        }
+
+        user.getGroups().remove(group);
+        group.getMembers().remove(user);
+
+        userRepository.save(user);
+        groupRepository.save(group);
     }
 }
