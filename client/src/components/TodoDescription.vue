@@ -114,6 +114,13 @@ function copyToClipboard(text: string): Promise<void> {
             >
                 {{ editing ? initialTitle : title }}
             </h2>
+            <span 
+                id="copy-to-clipboard-span"
+                class="material-symbols-outlined"
+                @click="copyToClipboard(`http://localhost:5173/todo/${activeTodoId}`)"
+            >
+                content_copy
+            </span>
         </TodoField>
         <TodoField>
             <FixedSizeSpan>
@@ -222,6 +229,17 @@ function copyToClipboard(text: string): Promise<void> {
     h2:hover {
         cursor: pointer;
         text-decoration: underline;
+    }
+
+    #copy-to-clipboard-span {
+        background-color: var(--main-color);
+        color: white;
+        padding: 4px;
+        border-radius: 5px;
+    }
+
+    #copy-to-clipboard-span:hover {
+        cursor: pointer;
     }
 
 </style>
