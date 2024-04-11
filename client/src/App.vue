@@ -11,10 +11,10 @@ const showNavbar = computed(() => {
     const currentRoute = useRoute();
     let value = true;
     if (
-      currentRoute.path == "/" ||
-      currentRoute.path == "/register" ||
-      currentRoute.path == "/login" ||
-      currentRoute.path == "/register-success"
+        currentRoute.path == "/" ||
+        currentRoute.path == "/register" ||
+        currentRoute.path == "/login" ||
+        currentRoute.path == "/register-success"
     ) {
       value = false;
     }
@@ -29,6 +29,7 @@ router.beforeEach((to, from) => {
 
     if ((to.path == '/my-todos' || 
         to.path == '/my-profile' || 
+        to.name == 'todo' ||
         to.path == '/groups') && 
         !localStorage.getItem('username')
     ) {
