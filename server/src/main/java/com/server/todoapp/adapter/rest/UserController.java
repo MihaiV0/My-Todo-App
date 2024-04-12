@@ -2,8 +2,10 @@ package com.server.todoapp.adapter.rest;
 
 import com.server.todoapp.application.UserService;
 import com.server.todoapp.domain.dto.UserLoginDto;
+import com.server.todoapp.domain.dto.UserPatchRequest;
 import com.server.todoapp.domain.dto.UserRegisterDto;
 import com.server.todoapp.domain.dto.UserResponseDto;
+import com.server.todoapp.domain.exception.ApiException;
 import com.server.todoapp.domain.exception.EmailAlreadyExistsException;
 import com.server.todoapp.domain.exception.InvalidLoginCredentialsException;
 import com.server.todoapp.domain.exception.UsernameAlreadyExistsException;
@@ -34,5 +36,12 @@ public class UserController {
     public ResponseEntity<UserResponseDto> loginUser(@RequestBody UserLoginDto userLoginDto)
             throws InvalidLoginCredentialsException {
         return new ResponseEntity<>(userService.loginUser(userLoginDto), HttpStatus.OK);
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<UserResponseDto> updateUser(@RequestBody UserPatchRequest request,
+                                                      @RequestParam("username") String username)
+            throws ApiException {
+        return new ResponseEntity<>(userService.updateUser(request, username), HttpStatus.OK);
     }
 }
