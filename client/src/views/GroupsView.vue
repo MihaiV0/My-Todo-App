@@ -54,6 +54,27 @@ onMounted(() => {
     loadGroupsFromServer();
 });
 
+function buildMessageWithUrl(messageText: string) {
+    const urlRegex: RegExp = /(?:https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?|(?:http:\/\/localhost:5173)/
+
+    if (!urlRegex.test(messageText)) {
+        return messageText
+    }
+
+    const words = messageText.split(' ')
+    let messageWithUrlLink = words[0]
+
+    for (let i = 1; i < words.length; i++) {
+        if (urlRegex.test(words[i])) {
+            messageWithUrlLink = messageWithUrlLink.concat(` <a href="${words[i]}" style="color: dodgerblue;">${words[i]}</a>`)
+        } else {
+            messageWithUrlLink = messageWithUrlLink.concat(' ', words[i])
+        }
+    }
+
+    return messageWithUrlLink
+}
+
 onBeforeRouteLeave(() => {
     clearInterval(mTimerIdLoadMessages)
 })
@@ -96,7 +117,7 @@ function hideErrorMessagePopup() {
 }
 
 function saveMessageAndReloadChatMessages(messageText: string, username: string) {
-    addMessage(mActiveGroupName.value, username, messageText)
+    addMessage(mActiveGroupName.value, username, buildMessageWithUrl(messageText))
         .then((res: Message) => {
             updateMessages(mActiveGroupName.value)
         })

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { transform } from 'typescript';
-import { computed, nextTick, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 interface Message {
     message: string,
@@ -38,27 +37,6 @@ function sendMessage() {
     }
 }
 
-function buildMessageWithUrl(messageText: string) {
-    const urlRegex: RegExp = /(?:https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?|(?:http:\/\/localhost:5173)/
-
-    if (!urlRegex.test(messageText)) {
-        return messageText
-    }
-
-    const words = messageText.split(' ')
-    let messageWithUrlLink = words[0]
-
-    for (let i = 1; i < words.length; i++) {
-        if (urlRegex.test(words[i])) {
-            messageWithUrlLink = messageWithUrlLink.concat(` <a href="${words[i]}" style="color: dodgerblue;">${words[i]}</a>`)
-        } else {
-            messageWithUrlLink = messageWithUrlLink.concat(' ', words[i])
-        }
-    }
-
-    return messageWithUrlLink
-}
-
 </script>
 
 <template>
@@ -80,7 +58,7 @@ function buildMessageWithUrl(messageText: string) {
                 </div>
                 <div 
                     style="text-align: start;"
-                    v-html="buildMessageWithUrl(message.message)"
+                    v-html="message.message"
                 >
                 </div>
                 <div
