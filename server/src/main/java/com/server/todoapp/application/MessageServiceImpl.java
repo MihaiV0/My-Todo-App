@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -55,7 +57,7 @@ public class MessageServiceImpl implements MessageService {
         }
 
         Message message = new Message();
-        message.setMessage(request.getMessage());
+        message.setMessage(buildMessageWithUrl(request.getMessage()));
         message.setUsername(ApiHelper.replaceUnderscoresWithSpaces(request.getUsername()));
         message.setDateTime(LocalDateTime.now());
         message.setGroup(group);
@@ -67,5 +69,25 @@ public class MessageServiceImpl implements MessageService {
         groupRepository.save(group);
 
         return ApiHelper.convertMessageToGroupMessage(messageRepository.save(message), modelMapper);
+    }
+
+    private String buildMessageWithUrl(String messageText) {
+        String urlRegex = "(?:(?:https?|ftp)://[\\w-]+(?:\\.[\\w-]+)*(?:[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?)|(?:(?:http://localhost:5173)(?:/[\\w@?^=%&/~+#-]+)?)";
+        Pattern pattern = Pattern.compile(urlRegex);
+        Matcher matcher = pattern.matcher(messageText);
+        StringBuilder messageWithUrlLink = new StringBuilder();
+        int lastIndex = 0;
+        while (matcher.find()) {
+            messageWithUrlLink.append(messageText, lastIndex, matcher.start());
+            messageWithUrlLink.append("<a href=\"")
+                    .append(matcher.group())
+                    .append("\" style=\"color: dodgerblue;\">")
+                    .append(matcher.group())
+                    .append("</a>");
+            lastIndex = matcher.end();
+        }
+        messageWithUrlLink.append(messageText.substring(lastIndex));
+
+        return messageWithUrlLink.toString();
     }
 }
