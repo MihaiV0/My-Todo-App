@@ -34,6 +34,7 @@ function updateValue(newValue: string) {
                     placeholder-text=""
                     :is-password-field="false"
                     @change-value="updateValue"
+                    @enter-pressed="emits('save-group', mValue)"
                     custom-width="25vw"
                 />
             </div>

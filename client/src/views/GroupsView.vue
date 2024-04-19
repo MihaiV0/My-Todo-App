@@ -80,7 +80,7 @@ function updateMessages(groupName: string) {
 }
 
 function saveGroup(groupName: string) {
-    addGroup(groupName)
+    addGroup(groupName, localStorage.getItem('username') || '')
         .then((group: Group) => {
             hideCreateGroupPopup();
             mGroups.value.push(group);

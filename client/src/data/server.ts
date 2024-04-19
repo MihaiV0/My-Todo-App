@@ -168,9 +168,9 @@ async function loadAllGroups() {
     return response.json();
 }
 
-async function addGroup(groupName: string) {
+async function addGroup(groupName: string, username: string) {
 
-    const response = await fetch(`${serverURL}groups/add`, {
+    const response = await fetch(`${serverURL}groups/add?username=${username}`, {
         "method": 'POST',
         "headers": {
             'Content-Type': 'application/json'

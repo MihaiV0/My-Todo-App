@@ -8,7 +8,7 @@ const props = defineProps({
     hasTooltip: Boolean,
 });
 
-const emits = defineEmits(['text-changed']);
+const emits = defineEmits(['text-changed', 'enter-pressed']);
 
 const inputType = ref('password');
 
@@ -31,6 +31,7 @@ function changeInputType() {
         :input-type="inputType"
         :placeholder-text="placeholder"
         @change-value="handleChangeValue"
+        @enter-pressed="emits('enter-pressed')"
         :is-password-field="true"
         :tooltip-text="hasTooltip ? 
             `The password must:

@@ -12,7 +12,7 @@ const props = defineProps({
     customWidth: String,
 });
 
-const emits = defineEmits(['change-value']);
+const emits = defineEmits(['change-value', 'enter-pressed']);
 
 const inputText = ref('');
 const focusedDiv = ref(false);
@@ -76,6 +76,7 @@ watch(
             @keyup="emits('change-value', inputText)"
             @blur="blurInput"
             @click="mouseClick($event)"
+            @keydown.enter="emits('enter-pressed')"
         >
         <slot></slot>
         <TooltipDisplay

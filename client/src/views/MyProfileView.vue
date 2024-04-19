@@ -100,6 +100,7 @@ function reoadUserData() {
                     placeholder-text="Username"
                     :is-password-field="false"
                     @change-value="usernameChanged"
+                    @enter-pressed="save"
                     :initial-value="mUsername"
                 />
             </TodoField>
@@ -112,6 +113,7 @@ function reoadUserData() {
                     placeholder-text="Email"
                     :is-password-field="false"
                     @change-value="emailChanged"
+                    @enter-pressed="save"
                     :initial-value="mEmail"
                 />
             </TodoField>

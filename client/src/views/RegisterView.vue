@@ -169,6 +169,7 @@ function acceptTermsAndConditions() {
             id="confirm-password"
             placeholder="Confirm password"
             @text-changed="changedConfirmPassword"
+            @enter-pressed="registerUser"
             :has-tooltip="true"
         />
         <div>

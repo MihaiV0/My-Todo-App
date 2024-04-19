@@ -56,6 +56,7 @@ function closeErrorPopup() {
         <PasswordInput
             placeholder="Password"
             @text-changed="passwordChanged"
+            @enter-pressed="loginUser"
             :has-tooltip="false"
         />
         <div>
