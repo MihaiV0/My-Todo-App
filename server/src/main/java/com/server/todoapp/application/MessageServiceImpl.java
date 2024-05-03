@@ -41,6 +41,11 @@ public class MessageServiceImpl implements MessageService {
         List<GroupMessage> messages = ApiHelper.convertListToDestinationType(messageRepository.findByGroupId(groupId),
                 modelMapper, Message.class, GroupMessage.class);
         Collections.sort(messages);
+
+        for (int i = 0; i < messages.size(); i++) {
+            messages.get(i).setMessage(buildMessageWithUrl(messages.get(i).getMessage()));
+        }
+
         return messages;
     }
 
@@ -57,7 +62,7 @@ public class MessageServiceImpl implements MessageService {
         }
 
         Message message = new Message();
-        message.setMessage(buildMessageWithUrl(request.getMessage()));
+        message.setMessage(request.getMessage());
         message.setUsername(ApiHelper.replaceUnderscoresWithSpaces(request.getUsername()));
         message.setDateTime(LocalDateTime.now());
         message.setGroup(group);

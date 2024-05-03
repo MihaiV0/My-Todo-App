@@ -82,7 +82,6 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("Email " + request.getEmail() + " is already used");
         }
 
-
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         return modelMapper.map(userRepository.save(user), UserResponseDto.class);
