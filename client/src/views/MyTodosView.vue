@@ -12,6 +12,7 @@ import CustomInput from '@/components/CustomInput.vue';
 import { useDateFormat, useNow } from '@vueuse/core';
 import DropDown from '@/components/DropDown.vue';
 import FilterTodosPopup from '@/components/FilterTodosPopup.vue';
+import TodoStatusCategories from '@/components/TodoStatusCategories.vue'
 
 interface Todo {
     todoId: number;
@@ -89,6 +90,7 @@ const mFilterInProgress = ref(false);
 const mFilterClosed = ref(false);
 const mFiltersActive = ref(false);
 const mShowCopyToClipboardToaster = ref(false);
+const mShowStatusLists = ref(false)
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -389,20 +391,31 @@ function showCopyToClipboardToaster() {
     }, 2000)
 }
 
+function showStatusLists() {
+    mShowStatusLists.value = !mShowStatusLists.value
+}
+
+function showDescriptionFromStatusList(todoId: number) {
+    mShowStatusLists.value = false
+    showTodoDesciption(todoId)
+}
 </script>
 
 <template>
     <div id="my-todos">
         <ToolbarBase>
-            <ToolbarButtonBase @click="addNewTodo">
+            <ToolbarButtonBase 
+                @click="addNewTodo"
+                v-show="!mShowStatusLists"
+            >
                 <span class="material-symbols-outlined green-sign">
                     add_task
                 </span>
                 Add new todo
             </ToolbarButtonBase>
-            <ToolbarSeparator v-show="activeTodoId > 0"/>
+            <ToolbarSeparator v-show="activeTodoId > 0 && !mShowStatusLists"/>
             <ToolbarButtonBase
-                v-show="activeTodoId > 0"
+                v-show="activeTodoId > 0 && !mShowStatusLists"
                 @click="editTodo"
             >
                 <span class="material-symbols-outlined blue-sign">
@@ -410,9 +423,9 @@ function showCopyToClipboardToaster() {
                 </span>
                 Edit
             </ToolbarButtonBase>
-            <ToolbarSeparator v-show="activeTodoId > 0"/>
+            <ToolbarSeparator v-show="activeTodoId > 0 && !mShowStatusLists"/>
             <ToolbarButtonBase
-                v-show="activeTodoId > 0"
+                v-show="activeTodoId > 0 && !mShowStatusLists"
                 @click="deleteTodo"
             >
                 <span class="material-symbols-outlined red-sign">
@@ -420,7 +433,7 @@ function showCopyToClipboardToaster() {
                 </span>
                 Delete
             </ToolbarButtonBase>
-            <ToolbarSeparator v-show="editing"/>
+            <ToolbarSeparator v-show="editing && !mShowStatusLists"/>
             <ToolbarButtonBase
                 v-show="editing"
                 @click="saveTodo"
@@ -430,9 +443,9 @@ function showCopyToClipboardToaster() {
                 </span>
                 Save
             </ToolbarButtonBase>
-            <ToolbarSeparator v-show="editing"/>
+            <ToolbarSeparator v-show="editing && !mShowStatusLists"/>
             <ToolbarButtonBase
-                v-show="editing"
+                v-show="editing && !mShowStatusLists"
                 @click="cancel"
             >
                 <span class="material-symbols-outlined red-sign">
@@ -440,15 +453,19 @@ function showCopyToClipboardToaster() {
                 </span>
                 Cancel
             </ToolbarButtonBase>
-            <ToolbarSeparator />
+            <ToolbarSeparator v-show="!mShowStatusLists"/>
             <CustomInput 
                 input-type="text"
                 placeholder-text="Search by title"
                 :is-password-field="false"
                 @change-value="search"
+                v-show="!mShowStatusLists"
             />
-            <ToolbarSeparator />
-            <div id="sorting-tools">
+            <ToolbarSeparator v-show="!mShowStatusLists"/>
+            <div 
+                id="sorting-tools"
+                v-show="!mShowStatusLists"
+            >
                 Sort by:
                 <DropDown 
                     drop-down-id="sort-by-drop-down"
@@ -458,22 +475,34 @@ function showCopyToClipboardToaster() {
                     :enabled="true"
                 />
             </div>
-            <ToolbarSeparator />
-            <ToolbarButtonBase @click="showFilterTodosPopup">
+            <ToolbarSeparator v-show="!mShowStatusLists"/>
+            <ToolbarButtonBase 
+                @click="showFilterTodosPopup"
+                v-show="!mShowStatusLists"
+            >
                 Filtering options
             </ToolbarButtonBase>
-            <ToolbarSeparator />
-            <div id="filter-status">
+            <ToolbarSeparator v-show="!mShowStatusLists"/>
+            <div 
+                id="filter-status"
+                v-show="!mShowStatusLists"
+            >
                 Filters: {{ mFiltersActive ? 'on' : 'off' }}
             </div>
+            <ToolbarSeparator v-show="!mShowStatusLists"/>
+            <ToolbarButtonBase @click="showStatusLists">
+                {{ !mShowStatusLists ? 'Show status lists' : 'Close status lists' }}
+            </ToolbarButtonBase>
         </ToolbarBase>
         <div id="my-todos-container">
             <TodoPanel 
                 :todos="todos"
                 @show-todo-description="showTodoDesciption"
                 :active-todo-id="activeTodoId"
+                v-show="!mShowStatusLists"
             />
             <TodoDescription 
+                v-show="!mShowStatusLists && activeTodoId != -2"
                 :description="todoDescription"
                 :title="todoTitle"
                 :dueDate="dueDate"
@@ -487,6 +516,11 @@ function showCopyToClipboardToaster() {
                 @status-changed="statusChanged"
                 @priority-changed="priorityChanged"
                 @copy-successful="showCopyToClipboardToaster"
+            />
+            <TodoStatusCategories 
+                v-show="mShowStatusLists"
+                :todos="todos"
+                @show-description-from-status-list="showDescriptionFromStatusList"
             />
         </div>
     </div>

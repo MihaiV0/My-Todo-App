@@ -3,7 +3,7 @@ import TodoListItem from './TodoListItem.vue';
 
 const props = defineProps({
     todos: {
-        type: Array as () => { todoId: number, title: string }[],
+        type: Array as () => { todoId: number, title: string, status: string }[],
         default: () => []
     },
     activeTodoId: Number,
@@ -23,6 +23,7 @@ function showTodoDescription(todoId: number) {
             :title="todo.title"
             @show-todo-description="showTodoDescription(todo.todoId)"
             :active-todo="activeTodoId == todo.todoId"
+            :status="todo.status"
         />
         <div 
             class="no-todos"

@@ -2,6 +2,7 @@
 const props = defineProps({
     title: String,
     activeTodo: Boolean,
+    status: String,
 });
 
 const emits = defineEmits(['show-todo-description']);
@@ -18,6 +19,24 @@ function showTodoDesciption() {
         :style="{ backgroundColor: activeTodo ? 'var(--background-color)' : '' }"
     >
         {{ title }}
+        <span 
+            class="material-symbols-outlined"
+            v-show="status == 'CLOSED'"
+        >
+            check_circle
+        </span>
+        <span 
+            class="material-symbols-outlined"
+            v-show="status == 'OPEN'"
+        >
+            circle
+        </span>
+        <span 
+            class="material-symbols-outlined"
+            v-show="status == 'IN PROGRESS'"
+        >
+            incomplete_circle
+        </span>
     </div>
 </template>
 
