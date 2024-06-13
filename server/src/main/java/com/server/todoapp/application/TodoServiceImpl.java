@@ -6,11 +6,13 @@ import com.server.todoapp.domain.data.types.Status;
 import com.server.todoapp.domain.dto.TodoPatchRequest;
 import com.server.todoapp.domain.dto.TodoPostRequest;
 import com.server.todoapp.domain.dto.TodoResponse;
+import com.server.todoapp.domain.entity.Rating;
 import com.server.todoapp.domain.entity.Todo;
 import com.server.todoapp.domain.entity.User;
 import com.server.todoapp.domain.exception.ApiException;
 import com.server.todoapp.domain.exception.TodoNotFoundException;
 import com.server.todoapp.domain.exception.UserNotFoundException;
+import com.server.todoapp.domain.repository.RatingRepository;
 import com.server.todoapp.domain.repository.TodoRepository;
 import com.server.todoapp.domain.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TodoServiceImpl implements TodoService {
@@ -30,10 +33,13 @@ public class TodoServiceImpl implements TodoService {
 
     private final UserRepository userRepository;
 
-    public TodoServiceImpl(ModelMapper modelMapper, TodoRepository todoRepository, UserRepository userRepository) {
+    private final RatingRepository ratingRepository;
+
+    public TodoServiceImpl(ModelMapper modelMapper, TodoRepository todoRepository, UserRepository userRepository, RatingRepository ratingRepository) {
         this.modelMapper = modelMapper;
         this.todoRepository = todoRepository;
         this.userRepository = userRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @Override
@@ -51,6 +57,7 @@ public class TodoServiceImpl implements TodoService {
                 request.getStatus()).toUpperCase()));
         todo.setPriority(Priority.valueOf(ApiHelper.replaceSpacesWithUnderscores(
                 request.getPriority()).toUpperCase()));
+        todo.setRatings(new ArrayList<>());
 
         if (user.getTodos() == null) {
             user.setTodos(new ArrayList<>());
@@ -94,7 +101,7 @@ public class TodoServiceImpl implements TodoService {
                     request.getPriority()).toUpperCase()));
         }
 
-        return modelMapper.map(todoRepository.save(todo), TodoResponse.class);
+        return ApiHelper.convertTodoToTodoResponse(todoRepository.save(todo));
     }
 
     @Override
@@ -121,6 +128,42 @@ public class TodoServiceImpl implements TodoService {
             throws ApiException {
         Todo todo = todoRepository.findByTodoId(id)
                 .orElseThrow(() -> new ApiException("Todo not found"));
-        return modelMapper.map(todo, TodoResponse.class);
+        return ApiHelper.convertTodoToTodoResponse(todo);
+    }
+
+    @Override
+    public TodoResponse updateRating(String username, Integer todoId, Double ratingValue)
+            throws ApiException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApiException("User with username " + username + " not found!"));
+        Todo todo = todoRepository.findByTodoId(todoId)
+                .orElseThrow(() -> new ApiException("Todo not found"));
+        if (Objects.equals(user.getId(), todo.getUser().getId())) {
+            throw new ApiException("You can't rate your own todo!");
+        }
+        for (int i = 0; i < todo.getRatings().size(); i++) {
+            if (Objects.equals(user.getId(), todo.getRatings().get(i).getUser().getId())) {
+                throw new ApiException("You already rated this todo!");
+            }
+        }
+
+        Rating rating = new Rating();
+        rating.setRating(ratingValue);
+        rating.setTodo(todo);
+        rating.setUser(user);
+
+        if (user.getRatings() == null) {
+            user.setRatings(new ArrayList<>());
+        }
+        user.getRatings().add(rating);
+
+        if (todo.getRatings() == null) {
+            todo.setRatings(new ArrayList<>());
+        }
+        todo.getRatings().add(rating);
+
+        userRepository.save(user);
+        ratingRepository.save(rating);
+        return ApiHelper.convertTodoToTodoResponse(todoRepository.save(todo));
     }
 }

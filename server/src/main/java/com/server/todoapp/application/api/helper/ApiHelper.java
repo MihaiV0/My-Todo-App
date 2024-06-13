@@ -2,8 +2,11 @@ package com.server.todoapp.application.api.helper;
 
 import com.server.todoapp.domain.dto.GroupMessage;
 import com.server.todoapp.domain.dto.GroupResponse;
+import com.server.todoapp.domain.dto.RatingResponse;
+import com.server.todoapp.domain.dto.TodoResponse;
 import com.server.todoapp.domain.entity.Group;
 import com.server.todoapp.domain.entity.Message;
+import com.server.todoapp.domain.entity.Todo;
 import com.server.todoapp.utils.DateUtils;
 import org.modelmapper.ModelMapper;
 
@@ -22,6 +25,8 @@ public class ApiHelper {
                 allItemsConverted.add((V) convertMessageToGroupMessage((Message) allItems.get(i), modelMapper));
             } else if (destinationType == GroupResponse.class) {
                 allItemsConverted.add((V) convertGroupToGroupResponse((Group) allItems.get(i)));
+            } else if (destinationType == TodoResponse.class) {
+                allItemsConverted.add((V) convertTodoToTodoResponse((Todo) allItems.get(i)));
             } else {
                 allItemsConverted.add(modelMapper.map(allItems.get(i), destinationType));
             }
@@ -76,5 +81,23 @@ public class ApiHelper {
         GroupMessage groupMessage = modelMapper.map(msg, GroupMessage.class);
         groupMessage.setDateTime(DateUtils.getDateAndTime((msg.getDateTime())));
         return groupMessage;
+    }
+
+    public static TodoResponse convertTodoToTodoResponse(Todo todo) {
+        TodoResponse response = new TodoResponse();
+        response.setDescription(todo.getTodoDescription());
+        response.setTitle(todo.getTodoTitle());
+        response.setPriority(todo.getPriority());
+        response.setTodoId(todo.getTodoId());
+        response.setStatus(todo.getStatus());
+        response.setDueDate(todo.getDueDate());
+        response.setRatings(new ArrayList<>());
+        for (int i = 0; i < todo.getRatings().size(); i++) {
+            RatingResponse ratingResponse = new RatingResponse();
+            ratingResponse.setValue(todo.getRatings().get(i).getRating());
+            ratingResponse.setUserId(todo.getRatings().get(i).getUser().getId());
+            response.getRatings().add(ratingResponse);
+        }
+        return response;
     }
 }

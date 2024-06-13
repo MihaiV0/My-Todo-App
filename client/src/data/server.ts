@@ -270,6 +270,23 @@ async function updateUser(oldUsername: string, newUsername: string, email: strin
     return json
 }
 
+async function rateTodo(username: string, todoId: number, ratingValue: number) {
+
+    const response = await fetch(`${serverURL}todos/rate?username=${username}&todoId=${todoId}&ratingValue=${ratingValue}`, {
+        "method": 'PATCH',
+        "headers": {
+            'Content-Type': 'application/json'
+        },
+    })
+
+    const json = await response.json()
+    if (!response.ok) {
+        throw new Error(json.message)
+    }
+
+    return json
+}
+
 function saveUserData(username: string, email: string) {
     localStorage.setItem('username', username);
     localStorage.setItem('email', email);
@@ -283,8 +300,7 @@ export {
     addGroup, addMessage, addUserToGroup, addUserTodo,
     clearUserData,
     editUserTodo,
-    getAllUserTodo, getTodoById, loadAllGroups, loadMessages, loginUserOnServer,
-    registerUserOnServer, removeUserFromGroup, saveUserData,
+    getAllUserTodo, getTodoById, loadAllGroups, loadMessages, loginUserOnServer, rateTodo, registerUserOnServer, removeUserFromGroup, saveUserData,
     searchTodo,
     todoDelete, updateUser
 };

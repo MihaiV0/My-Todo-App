@@ -45,6 +45,10 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Todo> todos;
 
+    @JsonIgnoreProperties("user")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Rating> ratings;
+
     @ManyToMany(mappedBy = "members")
     private List<Group> groups;
 

@@ -28,7 +28,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegisterDto userRegisterDto)
-            throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
+            throws UsernameAlreadyExistsException, EmailAlreadyExistsException, ApiException {
         return new ResponseEntity<>(userService.registerUser(userRegisterDto), HttpStatus.CREATED);
     }
     

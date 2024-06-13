@@ -25,4 +25,6 @@ public interface TodoService {
     List<TodoResponse> searchTodo(String text, String username) throws UserNotFoundException;
 
     TodoResponse getTodoById(Integer id) throws ApiException;
+
+    TodoResponse updateRating(String username, Integer todoId, Double ratingValue) throws ApiException;
 }

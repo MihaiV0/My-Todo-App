@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
 
-    UserResponseDto registerUser(UserRegisterDto userRegisterDTO) throws UsernameAlreadyExistsException, EmailAlreadyExistsException;
+    UserResponseDto registerUser(UserRegisterDto userRegisterDTO) throws UsernameAlreadyExistsException, EmailAlreadyExistsException, ApiException;
 
     UserResponseDto loginUser(UserLoginDto userLoginDTO) throws InvalidLoginCredentialsException;
 

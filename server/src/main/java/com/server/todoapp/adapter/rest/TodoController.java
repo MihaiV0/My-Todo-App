@@ -64,4 +64,12 @@ public class TodoController {
             throws ApiException {
         return new ResponseEntity<>(todoService.getTodoById(todoId), HttpStatus.OK);
     }
+
+    @PatchMapping("/rate")
+    public ResponseEntity<TodoResponse> rateTodo(@RequestParam("username") String username,
+                                                 @RequestParam("todoId") Integer todoId,
+                                                 @RequestParam("ratingValue") Double ratingValue)
+            throws ApiException {
+        return new ResponseEntity<>(todoService.updateRating(username, todoId, ratingValue), HttpStatus.OK);
+    }
 }

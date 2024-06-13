@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -41,4 +42,8 @@ public class Todo {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @JsonIgnoreProperties("todo")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "todo")
+    private List<Rating> ratings;
 }

@@ -5,6 +5,7 @@ import com.server.todoapp.domain.data.types.Status;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class TodoResponse {
@@ -20,4 +21,6 @@ public class TodoResponse {
     private Status status;
 
     private Priority priority;
+
+    private List<RatingResponse> ratings;
 }

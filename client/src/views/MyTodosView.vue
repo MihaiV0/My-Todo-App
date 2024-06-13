@@ -14,6 +14,11 @@ import DropDown from '@/components/DropDown.vue';
 import FilterTodosPopup from '@/components/FilterTodosPopup.vue';
 import TodoStatusCategories from '@/components/TodoStatusCategories.vue'
 
+interface Rating {
+    value: number
+    userId: number
+}
+
 interface Todo {
     todoId: number;
     title: string;
@@ -21,6 +26,7 @@ interface Todo {
     dueDate: string;
     status: string;
     priority: string;
+    ratings: Rating[]
 }
 
 const todos = ref<Array<Todo>>([]);
@@ -91,6 +97,7 @@ const mFilterClosed = ref(false);
 const mFiltersActive = ref(false);
 const mShowCopyToClipboardToaster = ref(false);
 const mShowStatusLists = ref(false)
+const mRatings = ref<Array<Rating>>([])
 
 function showTodoDesciption(todoId: number) {
     const todo = todos.value.find(todo => todo.todoId == todoId);
@@ -101,6 +108,7 @@ function showTodoDesciption(todoId: number) {
     dueDate.value = useDateFormat(todo?.dueDate, 'DD.MM.YYYY').value;
     status.value = todo?.status || '';
     priority.value = todo?.priority || '';
+    mRatings.value = todo?.ratings || []
 }
 
 function addNewTodo() {
@@ -111,6 +119,7 @@ function addNewTodo() {
         activeTodoId.value = -1;
         status.value = "OPEN";
         priority.value = "PRIO 2";
+        mRatings.value = []
 
         todos.value.push({
             todoId: -1,
@@ -118,7 +127,8 @@ function addNewTodo() {
             description: '',
             dueDate: useDateFormat(useNow(), 'DD.MM.YYYY').value,
             status: "OPEN",
-            priority: "PRIO 2"
+            priority: "PRIO 2",
+            ratings: []
         });
 
         currentOperation.value = 'add';
@@ -138,6 +148,7 @@ function cancel() {
         activeTodoId.value = -2;
         status.value = '';
         priority.value = '';
+        mRatings.value = []
 
         currentOperation.value = '';
     } else if (currentOperation.value == 'edit') {
@@ -152,6 +163,7 @@ function cancel() {
             dueDate.value = useDateFormat(activeTodo.dueDate, 'DD.MM.YYYY').value;
             status.value = activeTodo.status;
             priority.value = activeTodo.priority;
+            mRatings.value = activeTodo.ratings
         }
     }
 }
@@ -173,6 +185,7 @@ function saveTodo() {
                     currentOperation.value = '';
                     status.value = '';
                     priority.value = '';
+                    mRatings.value = []
                 })
                 .catch(err => {
                     errorMessage.value = err.message;
@@ -510,6 +523,7 @@ function showDescriptionFromStatusList(todoId: number) {
                 :active-todo-id="activeTodoId"
                 :status="status"
                 :priority="priority"
+                :ratings="mRatings"
                 @title-changed="titleChanged"
                 @description-changed="descriptionChanged"
                 @date-changed="dateChanged"

@@ -3,14 +3,8 @@ package com.server.todoapp.utils;
 import com.server.todoapp.application.api.helper.ApiHelper;
 import com.server.todoapp.domain.data.types.Priority;
 import com.server.todoapp.domain.data.types.Status;
-import com.server.todoapp.domain.entity.Group;
-import com.server.todoapp.domain.entity.Message;
-import com.server.todoapp.domain.entity.Todo;
-import com.server.todoapp.domain.entity.User;
-import com.server.todoapp.domain.repository.GroupRepository;
-import com.server.todoapp.domain.repository.MessageRepository;
-import com.server.todoapp.domain.repository.TodoRepository;
-import com.server.todoapp.domain.repository.UserRepository;
+import com.server.todoapp.domain.entity.*;
+import com.server.todoapp.domain.repository.*;
 import jakarta.transaction.Transactional;
 import org.mindrot.bcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,17 +26,20 @@ public class InitialDataLoader implements CommandLineRunner {
 
     private final MessageRepository messageRepository;
 
+    private final RatingRepository ratingRepository;
+
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
     @Value("${security.bcrypt.salt}")
     private String bcryptSalt;
 
-    public InitialDataLoader(UserRepository userRepository, TodoRepository todoRepository, GroupRepository groupRepository, MessageRepository messageRepository) {
+    public InitialDataLoader(UserRepository userRepository, TodoRepository todoRepository, GroupRepository groupRepository, MessageRepository messageRepository, RatingRepository ratingRepository) {
         this.userRepository = userRepository;
         this.todoRepository = todoRepository;
         this.groupRepository = groupRepository;
         this.messageRepository = messageRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @Transactional
@@ -91,6 +88,16 @@ public class InitialDataLoader implements CommandLineRunner {
                     "25.08.2024",
                     Status.IN_PROGRESS,
                     Priority.PRIO_1);
+
+            Rating rating1 = createRating(1.0);
+            rating1.setTodo(todoImplementGetAllTodosEndpoint);
+            rating1.setUser(userAndreiVasile);
+            todoImplementGetAllTodosEndpoint.getRatings().add(rating1);
+
+            Rating rating2 = createRating(3.0);
+            rating2.setTodo(todoImplementGetAllTodosEndpoint);
+            rating2.setUser(userDobreCosmin);
+            todoImplementGetAllTodosEndpoint.getRatings().add(rating2);
 
             Group group1 = createGroup("Romanian Informatics Revolution");
             group1.getMembers().add(userEdiPop);
@@ -178,6 +185,9 @@ public class InitialDataLoader implements CommandLineRunner {
 
             messageRepository.save(msg1);
             messageRepository.save(msg2);
+
+            ratingRepository.save(rating1);
+            ratingRepository.save(rating2);
         }
     }
 
@@ -204,6 +214,7 @@ public class InitialDataLoader implements CommandLineRunner {
         todo.setDueDate(LocalDate.parse(dueDate, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         todo.setStatus(status);
         todo.setPriority(priority);
+        todo.setRatings(new ArrayList<>());
 
         return todo;
     }
@@ -224,5 +235,12 @@ public class InitialDataLoader implements CommandLineRunner {
         message.setDateTime(DateUtils.parseDateTime(dateTime));
 
         return message;
+    }
+
+    private Rating createRating(Double value) {
+        Rating rating = new Rating();
+        rating.setRating(value);
+
+        return rating;
     }
 }

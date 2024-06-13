@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import CustomInput from './CustomInput.vue';
 import TodoField from './TodoField.vue';
 import CustomSizeTextarea from './CustomSizeTextarea.vue';
@@ -16,6 +16,10 @@ const props = defineProps({
     dueDate: String,
     status: String,
     priority: String,
+    ratings: {
+        type: Array as () => { value: number, userId: number }[],
+        default: () => []
+    },
 });
 
 const emits = defineEmits(['title-changed', 'description-changed', "date-changed", "status-changed", "priority-changed", 'copy-successful']);
@@ -40,6 +44,18 @@ const flatpickrConfig = {
 }
 const statusOptions = ["OPEN", "IN PROGRESS", "CLOSED"];
 const priorityOptions = ["PRIO 1", "PRIO 2"];
+const mAverageRating = ref(0)
+
+watch(
+    () => props.ratings,
+    (oldValue, newValue) => {
+        if (props.ratings.length != 0) {
+            let totalRating = 0
+            props.ratings.forEach(rating => totalRating += rating.value)
+            mAverageRating.value = totalRating / props.ratings.length
+        }
+    }
+);
 
 watch(
     () => props.title, 
@@ -186,6 +202,15 @@ function copyToClipboard(text: string): Promise<void> {
                 placeholder-text="Todo description"
                 :input-disabled="!editing"
             />
+        </TodoField>
+        <TodoField v-show="status == 'CLOSED'">
+            <FixedSizeSpan>
+                Average rating:
+            </FixedSizeSpan>
+            {{ mAverageRating }}
+            <span class="material-symbols-outlined">
+                star_rate
+            </span>
         </TodoField>
     </div>
 </template>
