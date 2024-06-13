@@ -9,6 +9,7 @@ import PasswordInput from '@/components/PasswordInput.vue';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
 import bcrypt from "bcryptjs";
 import TermsAndConditionsPopup from '@/components/TermsAndConditionsPopup.vue';
+import LoadingCircle from '@/components/LoadingCircle.vue';
 
 const acceptedTermsAndConditions = ref(false);
 const usernameText = ref('');
@@ -18,6 +19,7 @@ const confirmPasswordText = ref('');
 const errorMessage = ref('');
 const showErrorPopup = ref(false);
 const showTermsAndConditionsPopup = ref(false);
+const showLoadingCircle = ref(false)
 
 async function registerUser() {
     let inputOK = true;
@@ -98,12 +100,13 @@ async function registerUser() {
 
     if (inputOK) {
         const hashPassword = await bcrypt.hash(passwordText.value, "$2a$10$QkRidA35ea0Fzm/ObrOEgO");
-
+        showLoadingCircle.value = true
         registerUserOnServer(usernameText.value, emailText.value, hashPassword)
             .then(res => {
                 router.push('/register-success');
             })
             .catch(err => {
+                showLoadingCircle.value = false
                 errorMessage.value = err.message;
                 showErrorPopup.value = true;
             });
@@ -189,6 +192,9 @@ function acceptTermsAndConditions() {
         <CustomButton 
             text="Register"
             @button-click="registerUser"
+        />
+        <LoadingCircle 
+            v-show="showLoadingCircle"
         />
     </div>
     <Teleport to="body">
