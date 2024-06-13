@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { marked } from 'marked';
 
 interface Message {
     message: string,
@@ -41,7 +42,12 @@ function sendMessage() {
 
 <template>
     <div id="chat-container">
-        <div id="message-container">
+        <div 
+            id="message-container"
+            :style="{
+                height: mMessageText.length > 0 ? '75%' : '',
+            }"
+        >
             <div 
                 class="message" 
                 v-for="message in messages" 
@@ -58,7 +64,7 @@ function sendMessage() {
                 </div>
                 <div 
                     style="text-align: start;"
-                    v-html="message.message"
+                    v-html="marked(message.message)"
                 >
                 </div>
                 <div
@@ -66,6 +72,19 @@ function sendMessage() {
                 >
                     {{ message.dateTime }}
                 </div>
+            </div>
+        </div>
+        <div 
+            id="previewer"
+            v-show="mMessageText.length > 0"
+        >
+            <div id="previewer-title">
+                <b>Markdown Previewer</b>
+            </div>
+            <div 
+                v-html="marked(mMessageText)"
+                id="markdown-preview"
+            >
             </div>
         </div>
         <div id="input-container">
@@ -92,7 +111,6 @@ function sendMessage() {
         background-color: white;
         display: flex;
         flex-direction: column;
-        gap: 1vh;
     }
     
     #send-btn {
@@ -150,6 +168,21 @@ function sendMessage() {
         border-radius: 10px;
         gap: 0.5vh;
         text-align: end;
+    }
+
+    #previewer {
+        background-color: var(--background-color);
+        width: 100%;
+        height: 15%;
+    }
+
+    #previewer-title {
+        text-align: center;
+        padding-top: 1vh;
+    }
+
+    #markdown-preview {
+        padding: 0 1.5vw;
     }
 
 </style>
