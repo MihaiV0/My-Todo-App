@@ -2,16 +2,19 @@
 import CustomInput from '@/components/CustomInput.vue'
 import TodoField from '@/components/TodoField.vue'
 import FixedSizeSpan from '@/components/FixedSizeSpan.vue'
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import CustomButton from '@/components/CustomButton.vue'
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue'
 import { updateUser } from '@/data/server'
+import PopupBase from '@/components/PopupBase.vue'
+import router from '@/router'
+import { clearUserData } from '@/data/server'
 
 const mEmail = ref('')
 const mUsername = ref('')
 const mErrorMessage = ref('')
 const mShowErrorPopup = ref(false)
-const mShowSaveToaster = ref(false)
+const mShowSaveConfirmationPopup = ref(false)
 
 function emailChanged(newEmail: string) {
     mEmail.value = newEmail
@@ -59,12 +62,7 @@ async function save() {
     if (inputOK) {
         updateUser(localStorage.getItem('username') || '', mUsername.value, mEmail.value)
             .then(res => {
-                localStorage.setItem('username', mUsername.value)
-                localStorage.setItem('email', mEmail.value)
-                mShowSaveToaster.value = true
-                setTimeout(() => {
-                    mShowSaveToaster.value = false
-                }, 2000)
+                mShowSaveConfirmationPopup.value = true
             })
             .catch(err => {
                 if (err.message.includes('Email')) {
@@ -82,6 +80,11 @@ async function save() {
 function reoadUserData() {
     mEmail.value = localStorage.getItem('email') || ''
     mUsername.value = localStorage.getItem('username') || ''
+}
+
+function saveDataAndLogout() {
+    clearUserData();
+    router.push('/login');
 }
 </script>
 
@@ -134,15 +137,20 @@ function reoadUserData() {
             :show-popup="mShowErrorPopup"
             @close="closeErrorPopup"
         />
-        <div 
-            v-show="mShowSaveToaster"
-            id="save-toaster"
+        <PopupBase
+            :show="mShowSaveConfirmationPopup" 
         >
-            <span class="material-symbols-outlined">
-                info
-            </span>
-            Profile data saved
-        </div>
+            <div id="popup-body">
+                <span class="material-symbols-outlined">
+                    info
+                </span>
+                In order to update your data, you need to logout and login again.
+                <CustomButton 
+                    text="OK" 
+                    @button-click="saveDataAndLogout" 
+                />
+            </div>
+        </PopupBase>
     </Teleport>
 </template>
 
@@ -155,19 +163,17 @@ function reoadUserData() {
         gap: 1vh;
     }
 
-    #save-toaster {
-        position: absolute;
-        bottom: 5vh;
-        left: 43vw;
-        padding: 10px;
-        background-color: var(--main-color);
-        color: white;
+    #popup-body {
+        width: 35vw;
+        height: 20vh;
+        background-color: white;
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 7px;
-        box-shadow: inset;
-        gap: 0.2vw;
+        flex-direction: column;
+        gap: 1vh;
+        font-size: var(--default-font-size);
+        border-radius: 10px;
     }
 
     #buttons {
