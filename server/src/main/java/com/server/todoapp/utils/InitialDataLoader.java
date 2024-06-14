@@ -131,34 +131,39 @@ public class InitialDataLoader implements CommandLineRunner {
             group7.getMembers().add(userTudoseVera);
 
             Message msg1 = createMessage("I'll be late today. Prepare the presentation until I arrive.",
-                    ApiHelper.replaceUnderscoresWithSpaces(userEdiPop.getUsername()),
+                    userEdiPop,
                     "01-12-2018 09:45:03");
             msg1.setGroup(group1);
             group1.getMessages().add(msg1);
+            userEdiPop.getMessages().add(msg1);
 
             Message msg2 = createMessage("Ok, do you need me to do anything else?",
-                    ApiHelper.replaceUnderscoresWithSpaces(userVoicuAna.getUsername()),
+                    userVoicuAna,
                     "01-12-2018 09:50:18");
             msg2.setGroup(group1);
             group1.getMessages().add(msg2);
+            userVoicuAna.getMessages().add(msg2);
 
             Message msg3 = createMessage("Changed my mind. I don't want to do the presentation right now. Is that ok for you?",
-                    ApiHelper.replaceUnderscoresWithSpaces(userVoicuAna.getUsername()),
+                    userVoicuAna,
                     "01-12-2018 09:51:33");
             msg3.setGroup(group1);
             group1.getMessages().add(msg3);
+            userVoicuAna.getMessages().add(msg3);
 
             Message msg4 = createMessage("No, the presentation will take place as discussed in yesterday's team meeting",
-                    ApiHelper.replaceUnderscoresWithSpaces(userEdiPop.getUsername()),
+                    userEdiPop,
                     "01-12-2018 09:55:06");
             msg4.setGroup(group1);
             group1.getMessages().add(msg4);
+            userEdiPop.getMessages().add(msg4);
 
             Message msg5 = createMessage("Morning everybody. I'm not sure I'll get in time for today's presentation. I'll let you know if that's the case.",
-                    ApiHelper.replaceUnderscoresWithSpaces(userEdiPop.getUsername()),
+                    userEdiPop,
                     "01-12-2018 09:13:57");
             msg5.setGroup(group1);
             group1.getMessages().add(msg5);
+            userEdiPop.getMessages().add(msg5);
 
             userEdiPop.getTodos().add(todoFixDescriptionDisplay);
             userEdiPop.getTodos().add(todoImplementGetAllTodosEndpoint);
@@ -197,6 +202,7 @@ public class InitialDataLoader implements CommandLineRunner {
         user.setPassword(hashPassword);
         user.setUsername(username);
         user.setTodos(new ArrayList<>());
+        user.setMessages(new ArrayList<>());
 
         return user;
     }
@@ -228,10 +234,10 @@ public class InitialDataLoader implements CommandLineRunner {
         return group;
     }
 
-    private Message createMessage(String messageText, String username, String dateTime) {
+    private Message createMessage(String messageText, User user, String dateTime) {
         Message message = new Message();
         message.setMessage(messageText);
-        message.setUsername(username);
+        message.setUser(user);
         message.setDateTime(DateUtils.parseDateTime(dateTime));
 
         return message;

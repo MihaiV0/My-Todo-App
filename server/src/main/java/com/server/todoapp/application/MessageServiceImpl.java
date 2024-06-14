@@ -63,7 +63,7 @@ public class MessageServiceImpl implements MessageService {
 
         Message message = new Message();
         message.setMessage(request.getMessage());
-        message.setUsername(ApiHelper.replaceUnderscoresWithSpaces(request.getUsername()));
+        message.setUser(user);
         message.setDateTime(LocalDateTime.now());
         message.setGroup(group);
 
@@ -72,6 +72,12 @@ public class MessageServiceImpl implements MessageService {
         }
         group.getMessages().add(message);
         groupRepository.save(group);
+
+        if (user.getMessages() == null) {
+            user.setMessages(new ArrayList<>());
+        }
+        user.getMessages().add(message);
+        userRepository.save(user);
 
         return ApiHelper.convertMessageToGroupMessage(messageRepository.save(message), modelMapper);
     }

@@ -70,7 +70,7 @@ public class ApiHelper {
         for (int i = 0; i < group.getMessages().size(); i++) {
             GroupMessage message = new GroupMessage();
             message.setMessage(group.getMessages().get(i).getMessage());
-            message.setUsername(group.getMessages().get(i).getUsername());
+            message.setUsername(group.getMessages().get(i).getUser().getUsername());
             message.setDateTime(DateUtils.getDateAndTime(group.getMessages().get(i).getDateTime()));
             response.getMessages().add(message);
         }
@@ -80,6 +80,7 @@ public class ApiHelper {
     public static GroupMessage convertMessageToGroupMessage(Message msg, ModelMapper modelMapper) {
         GroupMessage groupMessage = modelMapper.map(msg, GroupMessage.class);
         groupMessage.setDateTime(DateUtils.getDateAndTime((msg.getDateTime())));
+        groupMessage.setUsername(replaceUnderscoresWithSpaces(msg.getUser().getUsername()));
         return groupMessage;
     }
 

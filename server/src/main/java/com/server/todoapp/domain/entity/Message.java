@@ -23,8 +23,10 @@ public class Message implements Comparable<Message> {
     @Column
     private String message;
 
-    @Column
-    private String username;
+    @JsonIgnoreProperties("messages")
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @Column
     private LocalDateTime dateTime;
