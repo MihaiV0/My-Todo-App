@@ -79,15 +79,47 @@ public class InitialDataLoader implements CommandLineRunner {
             Todo todoImplementGetAllTodosEndpoint = createTodo("Implement GET HTTP method get all todos endpoint",
                     "The endpoint must use GET HTTP method to return all todos for a specified user. The user id must be sent as query parameter to this endpoint.",
                     userEdiPop,
-                    "07.05.2024",
+                    "20.08.2024",
                     Status.CLOSED,
                     Priority.PRIO_2);
             Todo todoImplementSortingFunction = createTodo("Implement sorting function",
                     "Implement a sorting function to sort all todos by the due date field",
                     userEdiPop,
-                    "25.08.2024",
+                    "25.09.2024",
                     Status.IN_PROGRESS,
                     Priority.PRIO_1);
+            Todo todoDatabaseDesign = createTodo("Database Design",
+                    "Design the database schema for storing user credentials, profiles, roles, and " +
+                            "permissions. Ensure the design supports scalability and security best practices, " +
+                            "such as encryption of sensitive data.",
+                    userEdiPop,
+                    "30.10.2024",
+                    Status.IN_PROGRESS,
+                    Priority.PRIO_1);
+            Todo todoApiDevelopment = createTodo("API Development",
+                    "Develop APIs for user registration, login, password management, and account recovery." +
+                            " Ensure APIs follow RESTful principles and include proper authentication and authorization " +
+                            "mechanisms.",
+                    userEdiPop,
+                    "30.10.2024",
+                    Status.IN_PROGRESS,
+                    Priority.PRIO_1);
+            Todo todoUserInterfaceDesign = createTodo("User Interface Design",
+                    "Design the user interfaces for the authentication system, including login forms, " +
+                            "registration forms, and user management dashboards. Focus on usability and security, " +
+                            "such as preventing phishing attacks.",
+                    userEdiPop,
+                    "31.12.2024",
+                    Status.OPEN,
+                    Priority.PRIO_2);
+            Todo todoSecurityImplementation = createTodo("Security Implementation",
+                    "Implement security measures such as password hashing, multi-factor authentication " +
+                            "(MFA), rate limiting, and protection against common threats like SQL injection and " +
+                            "cross-site scripting (XSS).",
+                    userEdiPop,
+                    "31.12.2024",
+                    Status.OPEN,
+                    Priority.PRIO_2);
 
             Rating rating1 = createRating(1.0);
             rating1.setTodo(todoImplementGetAllTodosEndpoint);
@@ -168,6 +200,10 @@ public class InitialDataLoader implements CommandLineRunner {
             userEdiPop.getTodos().add(todoFixDescriptionDisplay);
             userEdiPop.getTodos().add(todoImplementGetAllTodosEndpoint);
             userEdiPop.getTodos().add(todoImplementSortingFunction);
+            userEdiPop.getTodos().add(todoDatabaseDesign);
+            userEdiPop.getTodos().add(todoApiDevelopment);
+            userEdiPop.getTodos().add(todoUserInterfaceDesign);
+            userEdiPop.getTodos().add(todoSecurityImplementation);
 
             userRepository.save(userEdiPop);
             userRepository.save(userVoicuAna);
@@ -179,6 +215,10 @@ public class InitialDataLoader implements CommandLineRunner {
             todoRepository.save(todoFixDescriptionDisplay);
             todoRepository.save(todoImplementGetAllTodosEndpoint);
             todoRepository.save(todoImplementSortingFunction);
+            todoRepository.save(todoDatabaseDesign);
+            todoRepository.save(todoApiDevelopment);
+            todoRepository.save(todoUserInterfaceDesign);
+            todoRepository.save(todoSecurityImplementation);
 
             groupRepository.save(group1);
             groupRepository.save(group2);

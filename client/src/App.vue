@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
 import NavButton from '@/components/NavButton.vue';
 import NavSeparator from '@/components/NavSeparator.vue';
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from "vue-router";
-import router from '@/router';
 import { clearUserData } from '@/data/server';
+import router from '@/router';
+import { computed, onMounted, ref } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
 
 const showNavbar = computed(() => {
     const currentRoute = useRoute();
@@ -23,9 +22,7 @@ const showNavbar = computed(() => {
 });
 
 router.beforeEach((to, from) => {
-    if (from.path == '/login' && to.path == '/my-todos') {
-        username.value = localStorage.getItem('username') || 'Username not found';
-    }
+    username.value = localStorage.getItem('username') || 'Username not found';
 
     if ((to.path == '/my-todos' || 
         to.path == '/my-profile' || 

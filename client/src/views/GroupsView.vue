@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AddNewGroupPopup from '@/components/AddNewGroupPopup.vue';
 import ErrorMessagePopup from '@/components/ErrorMessagePopup.vue';
+import GroupChat from '@/components/GroupChat.vue';
 import GroupsPanel from '@/components/GroupsPanel.vue';
 import ToolbarBase from '@/components/ToolbarBase.vue';
 import ToolbarButtonBase from '@/components/ToolbarButtonBase.vue';
-import UsersPanel from '@/components/UsersPanel.vue';
-import GroupChat from '@/components/GroupChat.vue';
 import ToolbarSeparator from '@/components/ToolbarSeparator.vue';
+import UsersPanel from '@/components/UsersPanel.vue';
 import { addGroup, addMessage, addUserToGroup, loadAllGroups, loadMessages, removeUserFromGroup } from '@/data/server';
 import { computed, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
@@ -100,7 +100,7 @@ function saveMessageAndReloadChatMessages(messageText: string, username: string)
         .then((res: Message) => {
             updateMessages(mActiveGroupName.value)
         })
-    setTimeout(scrollToBottomOfChat, 40)
+    setTimeout(scrollToBottomOfChat, 50)
 }
 
 function scrollToBottomOfChat() {
